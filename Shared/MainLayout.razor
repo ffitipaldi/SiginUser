@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>SiginUser</PageTitle>
+
+<div class="page">
+    @if (@authState.User.Identity.IsAuthenticated)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+
+    <main>
+        @if (@authState.User.Identity.IsAuthenticated)
+        {
+
+            <div class="top-row px-4 auth">
+                <LoginDisplay />
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            </div>
+        }
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code
+{
+	[CascadingParameter]
+	private Task<AuthenticationState> _authState { get; set; }
+	private AuthenticationState authState;
+	protected override async Task OnInitializedAsync()
+	{
+	    authState = await _authState;
+	}
+}

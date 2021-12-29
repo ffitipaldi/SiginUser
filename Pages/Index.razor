@@ -1,0 +1,47 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject NavigationManager navigation
+
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+
+<!-- lista o estado de autentiação do usuário -->
+@if(@authState.User.Identity.IsAuthenticated)
+{
+	<div><p><b>authState:</b>@authState</p></div>
+	<div class="row">
+		<div class="col-6"><p><b>Nome:</b> @authState.User.Identity.Name</p></div>
+		<div class="col-6"><p><b>Autenticado:</b> @authState.User.Identity.IsAuthenticated</p></div>
+	</div>
+			
+	@foreach (var claim in authState.User.Claims)
+	{   <div class="row">
+			<div class="col-6"><p><b>Claim Type:</b> @claim.Type</p></div> 
+			<div class="col-6"><p><b>Claim Value:</b> @claim.Value</p></div>
+		</div>
+	}
+}
+@code
+{
+    [CascadingParameter]
+    private Task<AuthenticationState> _authState { get; set; }
+    private AuthenticationState authState;
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await _authState;
+
+        if (authState.User.Identity.IsAuthenticated == false)
+        {
+            navigation.NavigateTo("/Identity/Account/Login", true);
+        }
+
+    }
+}
