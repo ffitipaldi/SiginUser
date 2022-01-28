@@ -1,9 +1,39 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <div class="row" align="right" alignv="center">
+            <div class="col-6"></div>
+            <div class="col-6" align="right">
+                <table>
+                    <tr>
+                        <td>
+                            <div class="dropdown show">
+                              <a class="dropdown-toggle" href="Identity/Account/Manage" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img (31).webp" class="rounded-circle" height="35" loading="lazy" />
+                              </a>
+
+                              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                              </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span>@context.User.Identity?.Name</span>
+                        </td>
+                        <td>
+                            <form method="post" action="Identity/Account/LogOut">
+                                <button type="submit" class="nav-link btn btn-link">Log out</button>
+                            </form>
+                        </td>
+                        <td>
+                            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
     </Authorized>
     <NotAuthorized>
         <a href="Identity/Account/Register">Register</a>

@@ -6,15 +6,165 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="page">
+    <!-- logotipo da Clínica -->
+    <table>
+        <tr>
+            <td><img src="/images/LogoMedio.png" width="80" /></td>
+            <td>
+                <table>
+                    <tr><td><img src="/images/ViaRapida.png" width="180" /></td></tr>
+                    <tr><td><span><b>Clínica de Medicina e Psicologia do Trânsito</b></span></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-Welcome to your new app.
+    <!-- Alerta de agendamentos e mensagens -->
+    <div class="alert alert-secondary mt-4">
+        <span class="oi oi-aperture me-2" aria-hidden="true"></span>
+        Olá @UserName.
+        Você tem atendimentos agendados para hoje e mensgens ainda não respondidas.
+    </div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <!-- Agendamentos -->
+    <div>
+        <span>Atendimentos agendados para hoje dia @DataCorrente:</span>
+        <!-- <button class="btn btn-success btn-sm" disabled>@TipoPerfil</button> -->
+        <button class="btn btn-primary btn-sm" disabled>@TipoPerfil</button>
+        <!-- <button class="btn btn-seondary btn-sm" disabled>@TipoPerfil</button> -->
+    </div>
 
+    <div class="row">
+
+        <!-- Detalhe dos agendamentos - tabela a esquerda -->
+        <div class="col-sm-4">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Ok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">08:00</th>
+                        <td>Francisco de Assis Moura</td>
+                        <td><span class="oi oi-check me-2" aria-hidden="true"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">09:00</th>
+                        <td>Maria do Socorro Melo</td>
+                        <td><span class="oi oi-x me-2" aria-hidden="true"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">10:00</th>
+                        <td>Adriana Vasconselos</td>
+                        <td><span></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">11:00</th>
+                        <td>Jussara Aparecida da Silva</td>
+                        <td><span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Detalhe dos agendamentos - tabela a direita -->
+        <div class="col-sm-4">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Ok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">13:00</th>
+                        <td>Adelaide Bezerra da Silva</td>
+                        <td><span></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">14:00</th>
+                        <td>Maria Clara Bernardes</td>
+                        <td><span></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">15:00</th>
+                        <td>Rafael de Andrade</td>
+                        <td><span></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">16:00</th>
+                        <td>Tatiana Azevêdo</td>
+                        <td><span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensagens -->
+        <div class="col-sm-4 container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        <span class="oi oi-envelope-closed me-2" aria-hidden="true"></span>
+                        &nbsp;Mensagens
+                    </h5>
+                </div>
+            </div>
+            <div class="card">
+                 <div class="card-body row">
+                    <div class="col-1"><small class="oi oi-chevron-right" aria-hidden="true"></small></div>
+                    <div class="col-11"><small class="card-text">DE:Jussara Fitipaldi – 27/01 10:37 <br /> Rever laudo da Maria do Socorro por Inconsistência de CID</small></div>
+                 </div>
+            </div>
+            <div class="card  text-right">
+                <div class="card-body row">
+                    <div class="col-11"><small class="card-text">DE:Fernando Fitipaldi – 27/01 11:25 <br /> Laudo revisado e reenviado para você.</small></div>
+                    <div class="col-1"><small class="oi oi-chevron-left" aria-hidden="true"></small></div>
+                </div>
+            </div>
+            <div class="card">
+                 <div class="card-body row">
+                    <div class="col-1"><small class="oi oi-chevron-right" aria-hidden="true"></small></div>
+                    <div class="col-11"><small class="card-text">DE:Jussara Fitipaldi – 27/01 10:37 <br /> Faltou assinar o laudo da Maria do Socorro</small></div>
+                 </div>
+            </div>
+            <div class="card-footer text-center">
+                <a href="#" class="btn btn-outline-primary">Nova mensagem</a>
+            </div>
+
+ @*               <div class="card-body">
+                    <table>
+                        <tr><td><span class="oi oi-chevron-right me-2" aria-hidden="true"></span></td>
+                            <td><p class="card-text">DE:Jussara Fitipaldi – 27/01 10:37 /n Rever laudo da Maria do Socorro /n Inconsistência de SID</p></td>
+                            <td></td>
+                        </tr>
+                        <tr><td></td>
+                            <td right><p class="card-text text-right">DE:Fernando Fitipaldi – 27/01 11:25 /n Laudo revisado e reenviado para você.</p></td>
+                            <td><span class="oi oi-chevron-left me-2" aria-hidden="true"></span></td>
+                        </tr>
+                        <tr><td><span class="oi oi-chevron-right me-2" aria-hidden="true"></span></td>
+                            <td><p class="card-text">DE:Jussara Fitipaldi – 27/01 10:37 /n Faltou assinar o laudo da Maria do Socorro</p></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="#" class="btn btn-outline-primary">Nova mensagem</a>
+                </div>
+            </div>*@
+        </div>
+    </div>
+</div>
 
 <!-- lista o estado de autentiação do usuário -->
-@if(@authState.User.Identity.IsAuthenticated)
+@*@if(@authState.User.Identity.IsAuthenticated)
 {
 	<div><p><b>authState:</b>@authState</p></div>
 	<div class="row">
@@ -28,12 +178,16 @@ Welcome to your new app.
 			<div class="col-6"><p><b>Claim Value:</b> @claim.Value</p></div>
 		</div>
 	}
-}
+}*@
 @code
 {
     [CascadingParameter]
     private Task<AuthenticationState> _authState { get; set; }
     private AuthenticationState authState;
+    private string UserName = "Fernando Fitipaldi";
+    private string DataCorrente = "Quinta-feira 27/01/2022";
+    private string TipoPerfil = "Psicólogo";
+
     protected override async Task OnInitializedAsync()
     {
         authState = await _authState;
@@ -42,6 +196,5 @@ Welcome to your new app.
         {
             navigation.NavigateTo("/Identity/Account/Login", true);
         }
-
     }
 }

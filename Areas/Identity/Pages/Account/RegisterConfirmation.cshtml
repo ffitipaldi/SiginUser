@@ -1,23 +1,67 @@
-﻿@page
+﻿@page 
 @model RegisterConfirmationModel
 @{
     ViewData["Title"] = "Register confirmation";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div align="center" > 
+	<div>&nbsp;</div>
+	<div class="card" style='width: 340px;'>
+		<img class="card-img-top" src="/images/identity/EmailEnviado.png" style='padding: 10px 100px 10px 100px;'> @* top right bottom left*@
+		<h5>E-Mail Enviado</h5>
+
+		<div class="card-body" align="left">
+            Por favor, abra o e-mail enviado e click no link para habilitar o seu acesso ao
+            Sistema de Diagnóstico e Acompanhamento Psicológico da Psicóloga Jussara de Jesus Fitipaldi.
+            <div align="center">
+                <p><a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a></p>
+		    </div>
+        </div>
+
+        <div>
+			<form id="ReEnvEmailForm" method="post">
+		        <button id="reEnvEmail" onclick="@buttonEnviar_Click" class="w-100 btn btn-lg btn-info">Reenviar e-mail</button>
+            </form>
+        </div>
+	</div> 
+	<br />
+	<a href="/">Voltar à página principal</a>
+    <p id="conteudo"></p>
+</div>
+
 @{
-    if (@Model.DisplayConfirmAccountLink)
+
+    async void buttonEnviar_Click(object sender, EventArgs e)
     {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
-    }
-    else
-    {
-<p>
-        Please check your email to confirm your account.
-</p>
+        using (System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient())
+        {
+            smtp.Host = "smtp.gmail.com";
+            smtp.Port = 587;
+            smtp.EnableSsl = true;
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = new System.Net.NetworkCredential("ffitipaldi@gmail.com", "Fiti02042005@");
+ 
+            using (System.Net.Mail.MailMessage mail = new System.Net.Mail.MailMessage())
+            {
+                var EmailBodyText = "Olá, <br /><br />" +
+                                    "Seja bem-vindo(a) ao Sistema de Diagnóstico e Acompanhamento Psicológico da Psicóloga Jussara de Jesus Fitipaldi. <br /><br />" +
+                                    "Por favor clique no link abaixo para habilitar o seu acesso.<br /><br />" +
+                                    "Att.<br />" +
+                                    "Jussara Fitipaldi<br /><br />" +
+                                    "<link>";
+                mail.From = new System.Net.Mail.MailAddress("ffitipaldi@gmail.com");
+                mail.To.Add(new System.Net.Mail.MailAddress("flfitipaldi@yahoo.com.br"));
+                mail.Subject = "E-mail de confirmação de acesso";
+                mail.Body = EmailBodyText;
+                await smtp.SendMailAsync(mail);
+            }
+        }
     }
 }
 
+<script>
+    function carregarConteudo()
+    {
+        document.getElementById("conteudo").innerHTML = "Novo conteudo carregado apos clicar no botão";
+    }
+</script>

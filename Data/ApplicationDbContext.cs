@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SiginUser.Models;
 
 namespace SiginUser.Data
 {
@@ -9,5 +10,7 @@ namespace SiginUser.Data
             : base(options)
         {
         }
+
+        public DbSet<Usuario> Usuarios { get; set; }
     }
 }
