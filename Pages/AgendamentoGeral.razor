@@ -1,0 +1,132 @@
+﻿@page "/agendamentogeral"
+
+<h3>Importar Agendamentos do Detran</h3>
+
+<!-- Alerta de agendamentos -->
+@if (@mensagem != "")
+{
+    <div class="alert alert-danger mt-4 alert-dismissible" id="alert1">
+        <span class="oi oi-circle-x me-2" aria-hidden="true"></span>@mensagem
+        <button class="btn-close" data-dismiss="alert1"></button>
+    </div>
+}
+
+
+<EditForm   Model="@importagendatxt" OnValidSubmit="@FormValidaImportAgendaTxt">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label form="campotxt">@instrucao</label>
+        <InputTextArea id="campotxt" @bind-Value="importagendatxt.CampoAgendaTxt" class="form-control" rows="25" style="font-size: 12px;" />
+    </div>
+
+    <input type="submit" value="Salvar" class="btn btn-primary" /> 
+
+</EditForm>
+
+
+@code {
+    ImportAgendaTxt importagendatxt = new ImportAgendaTxt();
+
+    private string? TipoPerfil = "";
+    private string? TipoPerfilDet = "";
+    private string? DataAgenda = "";
+    private string? NomeProfissional = "";
+    private string? CpfProfissional = "";
+    private int Lin = 0;
+    private int i = 0;
+    private int n = 0;
+    private string[]? Campos;
+    public string[]? agenda = new string[99];
+    public string? mensagem = "";
+    public string? instrucao = "Entre no site do DETRAN, copie todo o bloco RESULTADOS e cole a Agenda aqui:";
+
+    private void FormValidaImportAgendaTxt ()
+    { 
+        //converte o campo recebido em linhas 
+        string[] linhas = importagendatxt.CampoAgendaTxt.Split("\n");
+
+        //encontra a linha com a DATA DO AGENDAMENTO
+        for (i=0; i<6; i++)
+        {
+            if(linhas.Length > 5)
+            {
+                if (linhas[i].Length > 10)
+                {
+                    if (linhas[i].Substring(0, 5) == "DATA:") 
+                    {
+                        DataAgenda = linhas[i].Substring(6, 10);
+                        Lin = i;
+                        break;
+                    }
+                }               
+            }
+        }
+
+        //testa se dados colados puderam ser lidos
+        if (Lin == 0)
+        {
+            mensagem = "O sistema não conseguiu ler os dados colados. Por favor, tente copiar desde a linha de RESULTADOS até a última linha das agendas.";
+            return;
+        }
+
+        //recupera o tipo do Perfil = MÉDICO / PSICO, Nome, CPF
+        if (linhas[Lin + 1].Substring(0, 7) == "MÉDICO:")
+        {
+            TipoPerfil = "MED";
+            TipoPerfilDet = "médico";
+            NomeProfissional = linhas[Lin + 1].Substring(8);
+            NomeProfissional = NomeProfissional.Replace("\t", "");
+            CpfProfissional = linhas[Lin + 2].Substring(12,14);
+            CpfProfissional = CpfProfissional.Replace(".", "");
+            CpfProfissional = CpfProfissional.Replace("-", "");
+        }
+        else
+        {
+            TipoPerfil = "PSICO";
+            TipoPerfilDet = "psicólogo";
+            NomeProfissional = linhas[Lin + 1].Substring(11);
+            NomeProfissional = NomeProfissional.Replace("\t", "");
+            CpfProfissional = linhas[Lin + 2].Substring(5,14);
+            CpfProfissional = CpfProfissional.Replace(".", "");
+            CpfProfissional = CpfProfissional.Replace("-", "");
+        }
+
+        //trata as linhas dos agendamentos
+        importagendatxt.CampoAgendaTxt = "";
+        for (i=Lin+6; i<=linhas.Length-1; i++)
+        {
+            if(linhas[i].Length > 30)
+            {
+                //split da linha nos campos
+                Campos = linhas[i].Split("\t");
+
+                //trata apenas status "A realizar" para o médico
+                if (TipoPerfil == "MED")
+                {
+                    //if(Campos[7]=="A realizar")
+                    {
+                        //formata gravação da agenda do médico
+                        agenda[n] = linhas[i];
+                        n++;
+                        importagendatxt.CampoAgendaTxt = importagendatxt.CampoAgendaTxt + linhas[i] + "\n";
+                    }
+                } 
+                else
+                {
+                    //trata apenas status "A realizar" para o psicólogo
+                    //if(Campos[8]=="A realizar")
+                    {
+                        //formata gravação da agenda do médico
+                        agenda[n] = linhas[i];
+                        n++;
+                        importagendatxt.CampoAgendaTxt = importagendatxt.CampoAgendaTxt + linhas[i] + "\n";
+                    }                    
+                }
+            }
+        }
+        instrucao = "Linhas importadas do Detran que foram inseridas na agenda do " + TipoPerfilDet + " " + NomeProfissional + " para a data " + DataAgenda + ":";
+    }
+}
+

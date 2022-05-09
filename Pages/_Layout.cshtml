@@ -27,6 +27,19 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <footer class="footer border-top pl-3 text-muted" >        
+        <div class="container text-center">
+            &copy; 2022 - Via Rápida
+            @{
+                var foundPrivacy = Url.Page("/Privacy", new { area = "" });
+            }
+            @if (foundPrivacy != null)
+            {
+                <a asp-area="" asp-page="/Privacy">Privacy</a>
+            }
+        </div>
+    </footer>
+
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>

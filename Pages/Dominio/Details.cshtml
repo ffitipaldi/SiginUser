@@ -1,0 +1,43 @@
+﻿@page
+@model SiginUser.Pages.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Dominio</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Dominio.Campo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dominio.Campo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Dominio.Sigla)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dominio.Sigla)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Dominio.Descricao)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dominio.Descricao)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Dominio.Sequencia)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dominio.Sequencia)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Dominio.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

@@ -2,15 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using SiginUser.Data;
 using SiginUser.Models;
-using System;
 
 namespace SiginUser.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase
     {
+        //-------------------------------------------------//
+        //Pega o contexto do banco de dados
+        //-------------------------------------------------//
         private readonly ApplicationDbContext context;
 
         public UsuarioController(ApplicationDbContext context)
@@ -18,8 +19,9 @@ namespace SiginUser.Controllers
             this.context = context;
         }
 
-
-        //GET:api/ususario -  ler uma lista de Categorias
+        //-------------------------------------------------//
+        //GET:api/ususario -  lista com todos os Usuarios
+        //-------------------------------------------------//
         [HttpGet]
         public async Task<ActionResult<List<Usuario>>> Get()
         {
@@ -27,11 +29,11 @@ namespace SiginUser.Controllers
         }
 
         //GET:api/usuario/1  -  ler um Usuario pelo Id
-        [HttpGet("{id}", Name = "GetUsuario")]
-        public async Task<ActionResult<Usuario>> Get(string id)
+        [HttpGet("{id}", Name = "GetUsuarioById")]
+        public async Task<ActionResult<Usuario>> Get(int id)
         {
             //return await context.Usuarios.FirstOrDefaultAsync(x => x.UserId == id);
-            return await context.Usuarios.FirstOrDefaultAsync(x => x.UserId == 1);
+            return await context.Usuarios.FirstOrDefaultAsync(x => x.UserId == id);
         }
 
         //POST:api/usuario  - Inclui um novo Usuario
@@ -40,7 +42,7 @@ namespace SiginUser.Controllers
         {
             context.Add(usuario);
             await context.SaveChangesAsync();
-            return new CreatedAtRouteResult("GetUsuario", new { id = usuario.UserId }, usuario);
+            return new CreatedAtRouteResult("GetUsuarioById", new { id = usuario.UserId }, usuario);
         }
 
         //PUT:api/usuario   -  Altera um Usuario pelo Id contido no corpo da requisição

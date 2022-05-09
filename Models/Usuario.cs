@@ -24,6 +24,8 @@ namespace SiginUser.Models
 
         //[RegularExpression(@"^\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\)? ?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$", ErrorMessage ="Número inválido.")]
         [RegularExpression("^([14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])([2-8]|9[1-9])[0-9]{3}[0-9]{4}$", ErrorMessage = "Número inválido.")]
+        
+        [MaxLength(20,ErrorMessage ="Campo limitado a 20 caracteres")]
         public string? PhoneNumber { get; set; }
         public bool IsPhoneConfirmed { get; set; } = false;
         public DateTime? BlockedDate { get; set; }

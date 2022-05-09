@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SiginUser.Data;
 
@@ -11,9 +12,10 @@ using SiginUser.Data;
 namespace SiginUser.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220208193215_Dominios")]
+    partial class Dominios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,7 +254,7 @@ namespace SiginUser.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Dominios", (string)null);
+                    b.ToTable("Dominios");
                 });
 
             modelBuilder.Entity("SiginUser.Models.Usuario", b =>
@@ -296,7 +298,7 @@ namespace SiginUser.Data.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Usuarios", (string)null);
+                    b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
