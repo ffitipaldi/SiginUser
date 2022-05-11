@@ -40,7 +40,7 @@
     private string[]? Campos;
     public string[]? agenda = new string[99];
     public string? mensagem = "";
-    public string? instrucao = "Entre no site do DETRAN, copie todo o bloco RESULTADOS e cole a Agenda aqui:";
+    public string? instrucao = "Entre no site do DETRAN, copie todo o bloco RESULTADOS e cole aqui:";
 
     private void FormValidaImportAgendaTxt ()
     { 
@@ -120,6 +120,11 @@
                     {
                         //formata gravação da agenda do médico
                         agenda[n] = linhas[i];
+
+                        //verifica a existencia prêvia na agenda
+
+
+                        
                         n++;
                         importagendatxt.CampoAgendaTxt = importagendatxt.CampoAgendaTxt + linhas[i] + "\n";
                     }                    

@@ -21,20 +21,26 @@ namespace SiginUser.Controllers
             this.context = context;
         }
 
-        //---------------------------------------------------------//
-        //GET:api/dominio -  lista todos os Dominios = GetDominios
-        //---------------------------------------------------------//
+        /// <summary>
+        /// ---------------------------------------------------------//
+        /// GET:api/dominio -  lista todos os Dominios = GetDominios
+        /// ---------------------------------------------------------//
+        /// </summary>
         [HttpGet(Name = "GetDominios")]
         public async Task<ActionResult<List<Dominio>>> GetDominios()
         {
             return await context.Dominios.AsNoTracking()
-                .OrderBy(x => x.Campo)                      //faltou  x.Sequencia
+                .OrderBy(x => x.Campo)
+                .ThenBy(x => x.Sequencia)
                 .ToListAsync();
         }
 
-        //-------------------------------------------------------------//
-        //GET:api/dominio/1  -  ler um Dominio pelo Id = GetDominioById
-        //-------------------------------------------------------------//
+        /// <summary>
+        ///-------------------------------------------------------------//
+        ///GET:api/dominio/1  -  ler um Dominio pelo Id = GetDominioById
+        ///-------------------------------------------------------------//
+        /// </summary>
+        [] 
         [HttpGet("{id}", Name = "GetDominioById")]
         public async Task<ActionResult<Dominio>> GetDominioById(int id)
         {
@@ -43,9 +49,11 @@ namespace SiginUser.Controllers
                 .FirstOrDefaultAsync();
         }
 
-        //-----------------------------------------------------------//
-        //GET:api/dominio/campo/TipoSexo  -  Lista Dominio pelo campo
-        //-----------------------------------------------------------//
+        /// <summary>
+        ///-----------------------------------------------------------//
+        ///GET:api/dominio/campo/TipoSexo  -  Lista Dominio pelo campo
+        ///-----------------------------------------------------------//
+        /// </summary>
         [HttpGet("campo/{campo}", Name = "GetDominioByCampoList")]
         public async Task<ActionResult<List<Dominio>>> GetDominioByCampoList(string campo)
         {
@@ -55,9 +63,11 @@ namespace SiginUser.Controllers
                 .ToListAsync();
         }
 
-        //-----------------------------------------------------------------//
-        //GET:api/dominio/TipoSexo/MASC  -  Ler um Dominio pelo campo/Sigla
-        //-----------------------------------------------------------------//
+        /// <summary>
+        ///-----------------------------------------------------------------//
+        /// GET:api/dominio/TipoSexo/MASC  -  Ler um Dominio pelo campo/Sigla
+        ///-----------------------------------------------------------------//
+        /// </summary>
         [HttpGet("{campo}/{sigla}", Name = "GetDominioByCampoSigla")]
         public async Task<ActionResult<Dominio>> GetDominioByCampoSigla(string campo, string sigla)
         {
@@ -66,9 +76,11 @@ namespace SiginUser.Controllers
                 .FirstOrDefaultAsync();
         }
 
-        //-------------------------------------------------//
-        //POST:api/dominio  - Inclui um novo Dominio
-        //-------------------------------------------------//
+        /// <summary>
+        ///-------------------------------------------------//
+        /// POST:api/dominio  - Inclui um novo Dominio
+        ///-------------------------------------------------//
+        /// </summary>
         [HttpPost(Name ="IncluiDominio")]
         public async Task<ActionResult<Dominio>> Post(Dominio dominio)
         {
@@ -77,9 +89,11 @@ namespace SiginUser.Controllers
             return new CreatedAtRouteResult("GetDominioById", new { id = dominio.Id }, dominio);
         }
 
-        //-------------------------------------------------------------------------------//
-        //PUT:api/dominio/3 -  Altera um Dominio pelo Id contido no corpo da requisição
-        //-------------------------------------------------------------------------------//
+        /// <summary>
+        ///-------------------------------------------------------------------------------//
+        ///PUT:api/dominio/3 -  Altera um Dominio pelo Id contido no corpo da requisição
+        ///-------------------------------------------------------------------------------//
+        /// </summary>
         [HttpPut("{id}",Name ="AlteraDominio")]
         public async Task<ActionResult<Dominio>> Put(int id, Dominio dominio)
         {
@@ -88,9 +102,11 @@ namespace SiginUser.Controllers
             return Ok(dominio);
         }
 
-        //-------------------------------------------------//
-        //Deleta um Dominio pelo Id
-        //-------------------------------------------------//
+        /// <summary>
+        ///-------------------------------------------------//
+        ///Deleta um Dominio pelo Id
+        ///-------------------------------------------------//
+        /// </summary>
         [HttpDelete("{id}",Name ="ExcluiDominio")]
         public async Task<ActionResult<Dominio>> Delete(int id)
         {

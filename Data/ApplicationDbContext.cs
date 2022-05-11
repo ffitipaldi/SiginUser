@@ -13,5 +13,6 @@ namespace SiginUser.Data
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Dominio> Dominios { get; set; }
+        public DbSet<Agenda> Agendas { get; set; }
     }
 }

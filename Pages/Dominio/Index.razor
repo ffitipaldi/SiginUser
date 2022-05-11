@@ -33,15 +33,15 @@ else
 }
 
 @code {
-    Dominio[] dominios { get; set; }
+    //Dominio[] dominios { get; set; }
 
-    protected override async Task OninitializedAsync();
-    {
-    await CarregaDominios();
-    }
+    //protected override async Task OninitializedAsync();
+    //{
+    //await CarregaDominios();
+    //}
 
-    async Task CarregaDominios()
-    {
-        dominios = await HttpClient.GetJasonAsync<Dominio[]>("/api/categoria");
-    }
+    //async Task CarregaDominios()
+    //{
+    //    dominios = await HttpClient.GetJasonAsync<Dominio[]>("/api/categoria");
+    //}
 }
