@@ -1,47 +1,11 @@
 ﻿@page "/dominio"
-<h3>Domínios</h3>
 
-@if(dominios==null)
-{
-    <p><em>Carregando ...</em></p>
-}
-else if (dominios.Length==0)
-{
-    <p><em>Não existem Domínios cadastrados.</em></p>
-}
-else
-{
-    <table class=table>
-        <thead>
-            <tr>
-                <th>Campo</th>
-                <th>Sigla</th>
-                <th>Descrição</th>
-                <th>Sequencia</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Campo</td>
-                <td>Sigla</td>
-                <td>Descrição</td>
-                <td>Sequencia</td>
-            </tr>
-        </tbody>
+<PageTitle>Domínios</PageTitle>
 
-    </table>
-}
+<h2>Domínios</h2>
+
+
 
 @code {
-    //Dominio[] dominios { get; set; }
 
-    //protected override async Task OninitializedAsync();
-    //{
-    //await CarregaDominios();
-    //}
-
-    //async Task CarregaDominios()
-    //{
-    //    dominios = await HttpClient.GetJasonAsync<Dominio[]>("/api/categoria");
-    //}
 }
