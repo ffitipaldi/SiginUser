@@ -50,10 +50,18 @@ namespace SiginUser.Controllers
         [HttpGet(Name = "GetDominios")]
         public async Task<ActionResult<List<Dominio>>> GetDominios()
         {
-            return await context.Dominios.AsNoTracking()
-                .OrderBy(x => x.Campo)
-                .ThenBy(x => x.Sequencia)
-                .ToListAsync();
+            return await context.Dominios.FromSqlRaw
+                (
+                    "Select * " +
+                    "From Dominios " +
+                    "Order by Campo, Sequencia"
+
+                ).ToListAsync();
+
+            //return await context.Dominios.AsNoTracking()
+            //    .OrderBy(x => x.Campo)
+            //    .ThenBy(x => x.Sequencia)
+            //    .ToListAsync();
         }
 
 
@@ -76,9 +84,16 @@ namespace SiginUser.Controllers
         [HttpGet("{id}", Name = "GetDominioById")]
         public async Task<ActionResult<Dominio>> GetDominioById(int id)
         {
-            return await context.Dominios
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
+            return await context.Dominios.FromSqlRaw
+                (
+                    "Select * " +
+                    "From Dominios " +
+                    "Where Id = {0}", id
+                ) .FirstOrDefaultAsync();
+
+            //return await context.Dominios
+            //    .Where(x => x.Id == id)
+            //    .FirstOrDefaultAsync();
         }
 
 
@@ -110,10 +125,19 @@ namespace SiginUser.Controllers
         [HttpGet("campo/{campo}", Name = "GetDominioByCampoList")]
         public async Task<ActionResult<List<Dominio>>> GetDominioByCampoList(string campo)
         {
-            return await context.Dominios
-                .Where(x => x.Campo == campo)
-                .OrderBy(x => x.Sequencia)
-                .ToListAsync();
+            return await context.Dominios.FromSqlRaw
+                (
+                    "Select * " +
+                    "From Dominios " +
+                    "Where Campo = {0} " +
+                    "Order by Sequencia", campo
+
+                ).ToListAsync();
+
+            //return await context.Dominios
+            //    .Where(x => x.Campo == campo)
+            //    .OrderBy(x => x.Sequencia)
+            //    .ToListAsync();
         }
 
 

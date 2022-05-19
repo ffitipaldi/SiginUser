@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SiginUser.Data;
 using SiginUser.Models;
+using SiginUser.Models.Consultas;
 using System;
 using System.Reflection;
 
@@ -73,18 +74,16 @@ namespace SiginUser.Controllers
         /// TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#
         ///---------------------------------------------------------------------------------------------//
         /// 
-        [HttpGet("short/{cpfprofissional}/{datade}/{dataate}", Name = "GetAgendasShortByCpfData")]
-        public async Task<ActionResult<List<Agenda>>> GetAgendasShortByCpfData(string cpfprofissional, string datade, string dataate)
-        {
-            var dataDe = Convert.ToDateTime(datade);
-            var dataAte = Convert.ToDateTime(dataate).AddDays(1);
-
-            return await context.Agendas
-                .Where(x => x.CpfProfissional == cpfprofissional && x.DataAgenda >= dataDe && x.DataAgenda < dataAte)
-                //.Select(x => new { x.Id, x.DataAgenda, x.NomeCandidato, x.Telefone, x.StatusExPsico })
-                .OrderBy(x => x.DataAgenda)
-                .ToListAsync();
-        }
+        //[HttpGet("list/{cpfprofissional}", Name = "GetDataAgendasByCpf")]
+        //public async Task<ActionResult<List<Agendas>>> GetDataAgendasByCpf(string cpfprofissional)
+        //{
+        //    return await context.Agendas
+        //        .Where(x => x.CpfProfissional == cpfprofissional)
+        //        //.Select(x => new { x.Id, x.DataAgenda })
+        //        ////.GroupBy (x => x.DataAgenda)
+        //        //.OrderBy(x => x.DataAgenda)
+        //        .ToListAsync();
+        //}
 
 
 
@@ -310,5 +309,7 @@ namespace SiginUser.Controllers
             await context.SaveChangesAsync();
             return Ok(agenda);
         }
+
+
     }
 }
