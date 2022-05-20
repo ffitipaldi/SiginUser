@@ -25,7 +25,7 @@ namespace SiginUser.Controllers
 
         ///-------------------------------------------------------------//
         /// <summary>
-        /// GET:api/dominio -  lista todos os Dominios = GetDominios
+        /// GET:api/dominio/GetDominios -  lista todos os Dominios 
         /// </summary>
         /// <returns>
         ///     [
@@ -47,27 +47,27 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------------------//
         /// 
-        [HttpGet(Name = "GetDominios")]
+        [HttpGet("GetDominios", Name = "GetDominios")]
         public async Task<ActionResult<List<Dominio>>> GetDominios()
         {
-            return await context.Dominios.FromSqlRaw
-                (
-                    "Select * " +
-                    "From Dominios " +
-                    "Order by Campo, Sequencia"
+            //return await context.Dominios.FromSqlRaw
+            //    (
+            //        "Select * " +
+            //        "From Dominios " +
+            //        "Order by Campo, Sequencia"
 
-                ).ToListAsync();
+            //    ).ToListAsync();
 
-            //return await context.Dominios.AsNoTracking()
-            //    .OrderBy(x => x.Campo)
-            //    .ThenBy(x => x.Sequencia)
-            //    .ToListAsync();
+            return await context.Dominios.AsNoTracking()
+                .OrderBy(x => x.Campo)
+                .ThenBy(x => x.Sequencia)
+                .ToListAsync();
         }
 
 
-        ///-------------------------------------------------------------//
+        ///----------------------------------------------------------------//
         /// <summary>
-        /// GET:api/dominio/1  -  ler um Dominio pelo Id = GetDominioById
+        /// GET:api/dominio/GetDominioById/{id}  -  ler um Dominio pelo Id
         /// </summary>
         /// <param name="id">Identificador do Domínio que se deseja ler</param>
         /// <returns>
@@ -81,25 +81,25 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------------------//
         /// 
-        [HttpGet("{id}", Name = "GetDominioById")]
+        [HttpGet("GetDominioById/{id}", Name = "GetDominioById")]
         public async Task<ActionResult<Dominio>> GetDominioById(int id)
         {
-            return await context.Dominios.FromSqlRaw
-                (
-                    "Select * " +
-                    "From Dominios " +
-                    "Where Id = {0}", id
-                ) .FirstOrDefaultAsync();
+            //return await context.Dominios.FromSqlRaw
+            //    (
+            //        "Select * " +
+            //        "From Dominios " +
+            //        "Where Id = {0}", id
+            //    ) .FirstOrDefaultAsync();
 
-            //return await context.Dominios
-            //    .Where(x => x.Id == id)
-            //    .FirstOrDefaultAsync();
+            return await context.Dominios
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
         }
 
 
         ///-----------------------------------------------------------//
         /// <summary>
-        /// GET:api/dominio/campo/TipoSexo  -  Lista Dominio pelo campo
+        /// GET:api/dominio/GetDominiosByCampo/{campo}  -  Lista Dominio pelo campo
         /// </summary>
         /// <param name="campo">Nome do campo desejado a ser listado</param>
         /// <returns>
@@ -122,28 +122,27 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-----------------------------------------------------------//
         ///
-        [HttpGet("campo/{campo}", Name = "GetDominioByCampoList")]
-        public async Task<ActionResult<List<Dominio>>> GetDominioByCampoList(string campo)
+        [HttpGet("GetDominiosByCampo/{campo}", Name = "GetDominiosByCampo")]
+        public async Task<ActionResult<List<Dominio>>> GetDominiosByCampo(string campo)
         {
-            return await context.Dominios.FromSqlRaw
-                (
-                    "Select * " +
-                    "From Dominios " +
-                    "Where Campo = {0} " +
-                    "Order by Sequencia", campo
+            //return await context.Dominios.FromSqlRaw
+            //    (
+            //        "Select * " +
+            //        "From Dominios " +
+            //        "Where Campo = {0} " +
+            //        "Order by Sequencia", campo
+            //    ).ToListAsync();
 
-                ).ToListAsync();
-
-            //return await context.Dominios
-            //    .Where(x => x.Campo == campo)
-            //    .OrderBy(x => x.Sequencia)
-            //    .ToListAsync();
+            return await context.Dominios
+                .Where(x => x.Campo == campo)
+                .OrderBy(x => x.Sequencia)
+                .ToListAsync();
         }
 
 
         ///-----------------------------------------------------------//
         /// <summary>
-        /// GET:api/dominio/TipoSexo/MASC  -  Ler um Dominio pelos campos: Campo e Sigla 
+        /// GET:api/dominio/GetDominioByCampoSigla/{campo}/{sigla}  -  Ler um Dominio pelos campos: Campo e Sigla 
         /// </summary>
         /// <param name="campo">Nome do campo desejado a ser listado</param>
         /// <param name="sigla">Sigla pertencente ao campo listado</param>
@@ -158,7 +157,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-----------------------------------------------------------//
         ///
-        [HttpGet("{campo}/{sigla}", Name = "GetDominioByCampoSigla")]
+        [HttpGet("GetDominioByCampoSigla/{campo}/{sigla}", Name = "GetDominioByCampoSigla")]
         public async Task<ActionResult<Dominio>> GetDominioByCampoSigla(string campo, string sigla)
         {
             return await context.Dominios
@@ -167,11 +166,38 @@ namespace SiginUser.Controllers
         }
 
 
+
         ///-----------------------------------------------------------//
         /// <summary>
-        /// POST:api/dominio  - Inclui um novo Dominio 
+        /// GET:api/dominio/GetDominioByCampoDesc/{descricao}  -  Ler um Dominio pelo Campo e Descrição 
         /// </summary>
-        /// <param name="dominio">Jason com a estrutura de um domínio com id = 0
+        /// <param name="campo">Nome do campo desejado a ser listado</param>
+        /// <param name="descricao">Descrição de um domínio</param>
+        /// <returns>
+        ///    {
+        ///        "id": 1,
+        ///        "campo": "TipoSexo",
+        ///        "sigla": "MASC",
+        ///        "descricao": "Masculino",
+        ///        "sequencia": 1
+        ///    }
+        /// </returns>
+        ///-----------------------------------------------------------//
+        ///
+        [HttpGet("GetDominioByCampoDesc/{campo}/{descricao}", Name = "GetDominioByCampoDesc")]
+        public async Task<ActionResult<Dominio>> GetDominioByCampoDesc(string campo, string descricao)
+        {
+            return await context.Dominios
+                .Where(x => x.Campo == campo && x.Descricao == descricao)
+                .FirstOrDefaultAsync();
+        }
+
+
+        ///-----------------------------------------------------------//
+        /// <summary>
+        /// POST:api/dominio/AddDominio  - Inclui um novo Dominio 
+        /// </summary>
+        /// Jason com a estrutura de um domínio com id = 0
         ///     {
         ///       "id": 0,
         ///       "campo": "TipoSexo",
@@ -179,7 +205,6 @@ namespace SiginUser.Controllers
         ///       "descricao": "Masculino",
         ///       "sequencia": 3
         ///     }
-        /// </param>
         /// <returns>
         ///     {
         ///       "id": 32,
@@ -191,7 +216,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-----------------------------------------------------------//
         ///
-        [HttpPost(Name ="IncluiDominio")]
+        [HttpPost("AddDominio", Name ="AddDominio")]
         public async Task<ActionResult<Dominio>> Post(Dominio dominio)
         {
             context.Add(dominio);
@@ -200,8 +225,9 @@ namespace SiginUser.Controllers
         }
 
 
+        ///-----------------------------------------------------------//
         /// <summary>
-        /// PUT:api/dominio/32 -  Altera um Dominio pelo Id contido no corpo da requisição 
+        /// PUT:api/dominio/UpdateDominioById/{id} -  Altera um Dominio pelo Id contido no corpo da requisição 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="dominio">Jason com a estrutura de um domínio com id a alterar 
@@ -222,8 +248,9 @@ namespace SiginUser.Controllers
         ///       "sequencia": 3
         ///     }
         /// </returns>
+        ///-----------------------------------------------------------//
         /// 
-        [HttpPut("{id}",Name ="AlteraDominio")]
+        [HttpPut("UpdateDominioById/{id}", Name = "UpdateDominioById")]
         public async Task<ActionResult<Dominio>> Put(int id, Dominio dominio)
         {
             context.Entry(dominio).State = EntityState.Modified;
@@ -232,8 +259,9 @@ namespace SiginUser.Controllers
         }
 
 
+        ///-----------------------------------------------------------//
         /// <summary>
-        /// DELETE:api/dominio/32 - Deleta um Dominio pelo Id
+        /// DELETE:api/dominio/DeleteDominioById/{id} - Deleta um Dominio pelo Id
         /// </summary>
         /// <param name="id">Identificador que se deseja deletar</param>
         /// <returns>
@@ -245,8 +273,9 @@ namespace SiginUser.Controllers
         ///   "sequencia": 0
         /// }
         /// </returns>
+        ///-----------------------------------------------------------//
         /// 
-        [HttpDelete("{id}",Name ="ExcluiDominio")]
+        [HttpDelete("DeleteDominioById/{id}", Name = "DeleteDominioById")]
         public async Task<ActionResult<Dominio>> Delete(int id)
         {
             var dominio = new Dominio { Id = id };

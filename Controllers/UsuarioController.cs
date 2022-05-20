@@ -19,25 +19,48 @@ namespace SiginUser.Controllers
             this.context = context;
         }
 
-        //-------------------------------------------------//
-        //GET:api/ususario -  lista com todos os Usuarios
-        //-------------------------------------------------//
-        [HttpGet]
-        public async Task<ActionResult<List<Usuario>>> Get()
+        ///-------------------------------------------------//
+        /// <summary>
+        /// GET:api/ususario/GetUsuarios -  lista com todos os Usuarios
+        /// </summary>
+        /// <returns></returns>
+        ///-------------------------------------------------//
+        ///
+        [HttpGet("GetUsuarios", Name = "GetUsuarios")]
+        public async Task<ActionResult<List<Usuario>>> GetUsuarios()
         {
-            return await context.Usuarios.AsNoTracking().ToListAsync();
+            return await context.Usuarios.AsNoTracking()
+                .OrderBy(x => x.UserName)
+                .ToListAsync();
         }
 
-        //GET:api/usuario/1  -  ler um Usuario pelo Id
-        [HttpGet("{id}", Name = "GetUsuarioById")]
-        public async Task<ActionResult<Usuario>> Get(int id)
+
+
+        ///----------------------------------------------------------------//
+        /// <summary>
+        /// GET:api/usuario/GetUsuarioById/{id}  -  ler um Usuario pelo Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// ---------------------------------------------------------------//
+        /// 
+        [HttpGet("GetUsuarioById/{id}", Name = "GetUsuarioById")]
+        public async Task<ActionResult<Usuario>> GetUsuarioById(int id)
         {
-            //return await context.Usuarios.FirstOrDefaultAsync(x => x.UserId == id);
-            return await context.Usuarios.FirstOrDefaultAsync(x => x.UserId == id);
+            return await context.Usuarios
+                .Where(x => x.UserId == id)
+                .FirstOrDefaultAsync();
         }
 
-        //POST:api/usuario  - Inclui um novo Usuario
-        [HttpPost]
+        ///-----------------------------------------------------------//
+        /// <summary>
+        /// POST:api/usuario/AddUsuario  - Inclui um novo Usuario
+        /// </summary>
+        /// <param name="usuario">JASON com o id = 0</param>
+        /// <returns></returns>
+        ///-----------------------------------------------------------//
+        ///
+        [HttpPost("AddUsuario", Name = "AddUsuario")]
         public async Task<ActionResult<Usuario>> Post(Usuario usuario)
         {
             context.Add(usuario);
@@ -45,10 +68,19 @@ namespace SiginUser.Controllers
             return new CreatedAtRouteResult("GetUsuarioById", new { id = usuario.UserId }, usuario);
         }
 
-        //PUT:api/usuario   -  Altera um Usuario pelo Id contido no corpo da requisição
-        //PUT:api/categoria/3 -  Altera ua Usuario pelo Id contido no corpo da requisição
-        [HttpPut]
-        [HttpPut("{id}")]
+
+
+        ///-----------------------------------------------------------------------------------------//
+        /// <summary>
+        /// PUT:api/usuario/UpdateUsuarioById/{id} -  Altera ua Usuario pelo Id contido no corpo da requisição
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="usuario"></param>
+        /// <returns></returns>
+        ///-----------------------------------------------------------------------------------------//
+        ///
+        [HttpPut("UpdateUsuarioById/{id}", Name = "UpdateUsuarioById")]
+
         public async Task<ActionResult<Usuario>> Put(int id, Usuario usuario)
         {
             context.Entry(usuario).State = EntityState.Modified;
@@ -56,8 +88,16 @@ namespace SiginUser.Controllers
             return Ok(usuario);
         }
 
-        //Deleta um Usuario pelo Id
-        [HttpDelete("{id}")]
+
+        ///--------------------------------------------------------------------//
+        /// <summary>
+        /// Delete:api/usuario/DeleteUsuarioById/{id} - Deleta um usuario pelo Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        ///--------------------------------------------------------------------//
+        ///
+        [HttpDelete("DeleteUsuarioById/{id}", Name = "DeleteUsuarioById")]
         public async Task<ActionResult<Usuario>> Delete(int id)
         {
             var usuario = new Usuario { UserId = id };

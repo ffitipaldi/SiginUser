@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SiginUser.Data;
 using SiginUser.Models;
 using SiginUser.Models.Consultas;
 using System;
+using System.Data;
 using System.Reflection;
 
 namespace SiginUser.Controllers
@@ -16,16 +18,13 @@ namespace SiginUser.Controllers
         //Pega o contexto do banco de dados
         //-------------------------------------------------//
         private readonly ApplicationDbContext context;
+        public AgendaController(ApplicationDbContext context) => this.context = context;
 
-        public AgendaController(ApplicationDbContext context)
-        {
-            this.context = context;
-        }
 
 
         ///---------------------------------------------------------//
         /// <summary>
-        /// GET:api/agenda -  lista todas as Agendas = GetAgendas        
+        /// GET:api/agenda/GetAgendas -  lista todas as Agendas = GetAgendas        
         /// </summary>
         /// <returns>
         ///     [
@@ -50,46 +49,24 @@ namespace SiginUser.Controllers
         /// </returns>
         ///---------------------------------------------------------//
         /// 
-        [HttpGet(Name = "GetAgendas")]
+        [HttpGet("GetAgendas", Name = "GetAgendas")]
         public async Task<ActionResult<List<Agenda>>> GetAgendas()
         {
             return await context.Agendas.AsNoTracking()
-                .OrderBy(x => x.CpfProfissional )  
-                .ThenBy(x => x.DataAgenda)
+                .OrderByDescending(x => x.DataAgenda)  
                 .ToListAsync();
+
+            //return await context.Agendas.AsNoTracking()
+            //    .OrderBy(x => x.CpfProfissional)
+            //    .ThenBy(x => x.DataAgenda)
+            //    .ToListAsync();
         }
 
 
 
         ///---------------------------------------------------------------------------------------------//
-        /// TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#
         /// <summary>
-        /// GET:api/agenda/CpfProfisional/DataAgenda  -  Ler uma lita de Agendas pelos campos CPF e Data
-        /// </summary>
-        /// <param name="cpfprofissional">Cpf do Profissional</param>
-        /// <param name="datade"> Data DE (início do intervalo a ser listado)</param>
-        /// <param name="dataate">Data ATE (final do intervalo a ser listado)</param>
-        /// <returns>
-        /// </returns>
-        /// TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#
-        ///---------------------------------------------------------------------------------------------//
-        /// 
-        //[HttpGet("list/{cpfprofissional}", Name = "GetDataAgendasByCpf")]
-        //public async Task<ActionResult<List<Agendas>>> GetDataAgendasByCpf(string cpfprofissional)
-        //{
-        //    return await context.Agendas
-        //        .Where(x => x.CpfProfissional == cpfprofissional)
-        //        //.Select(x => new { x.Id, x.DataAgenda })
-        //        ////.GroupBy (x => x.DataAgenda)
-        //        //.OrderBy(x => x.DataAgenda)
-        //        .ToListAsync();
-        //}
-
-
-
-        ///---------------------------------------------------------------------------------------------//
-        /// <summary>
-        /// GET:api/agenda/CpfProfisional/DataAgenda  -  Ler uma lita de Agendas pelos campos CPF e Data
+        /// GET:api/agenda/GetAgendasByCpfData/{cpfprofissional}/{datade}/{dataate}  -  Ler uma lita de Agendas pelos campos CPF e Data
         /// </summary>
         /// <param name="cpfprofissional">Cpf do Profissional</param>
         /// <param name="datade"> Data DE (início do intervalo a ser listado)</param>
@@ -117,7 +94,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///---------------------------------------------------------------------------------------------//
         /// 
-        [HttpGet("{cpfprofissional}/{datade}/{dataate}", Name = "GetAgendasByCpfData")]
+        [HttpGet("GetAgendasByCpfData/{cpfprofissional}/{datade}/{dataate}", Name = "GetAgendasByCpfData")]
         public async Task<ActionResult<List<Agenda>>> GetAgendasByCpfData(string cpfprofissional, string datade, string dataate)
         {
             var dataDe = Convert.ToDateTime(datade);
@@ -133,7 +110,7 @@ namespace SiginUser.Controllers
 
         ///-------------------------------------------------------------//
         /// <summary>
-        /// GET:api/agenda/1  -  ler uma Agenda pelo Id = GetAgendaById
+        /// GET:api/agenda/GetAgendaById/{id}  -  ler uma Agenda pelo Id = GetAgendaById
         /// </summary>
         /// <param name="id"></param>
         /// <returns>
@@ -157,7 +134,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------------------//
         ///
-        [HttpGet("{id}", Name = "GetAgendaById")]
+        [HttpGet("GetAgendaById/{id}", Name = "GetAgendaById")]
         public async Task<ActionResult<Agenda>> GetAgendaById(int id)
         {
             return await context.Agendas
@@ -169,7 +146,7 @@ namespace SiginUser.Controllers
 
         ///-------------------------------------------------//
         /// <summary>
-        /// POST:api/agnda  - Inclui uma nova Agenda
+        /// POST:api/agnda/AddAgenda  - Inclui uma nova Agenda
         /// </summary>
         /// <param name="agenda"> JSON com a estrutura da Agenda com ID = 0
         ///     {
@@ -211,7 +188,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------//
         ///
-        [HttpPost(Name = "IncluiAgenda")]
+        [HttpPost("AddAgenda", Name = "AddAgenda")]
         public async Task<ActionResult<Agenda>> Post(Agenda agenda)
         {
             context.Add(agenda);
@@ -222,7 +199,7 @@ namespace SiginUser.Controllers
 
         ///-------------------------------------------------------------------------------//
         /// <summary>
-        /// PUT:api/agenda/2 -  Altera uma Agenda pelo Id contido no corpo da requisição
+        /// PUT:api/agenda/UpdateAgendaById/{id} -  Altera uma Agenda pelo Id contido no corpo da requisição
         /// </summary>
         /// <param name="id">
         ///     {
@@ -265,7 +242,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------------------------------------//
         ///
-        [HttpPut("{id}", Name = "AlteraAgenda")]
+        [HttpPut("UpdateAgendaById/{id}", Name = "UpdateAgendaById")]
         public async Task<ActionResult<Agenda>> Put(int id, Agenda agenda)
         {
             context.Entry(agenda).State = EntityState.Modified;
@@ -277,7 +254,7 @@ namespace SiginUser.Controllers
 
         ///-------------------------------------------------//
         /// <summary>
-        /// DELETE: api/agenda/3 - Deleta uma Agenda pelo Id
+        /// DELETE: api/agenda/DeleteAgendaById{id} - Deleta uma Agenda pelo Id
         /// </summary>
         /// <param name="id">Identificador da Agenda que se deseja excluir</param>
         /// <returns>
@@ -301,7 +278,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------//
         /// 
-        [HttpDelete("{id}", Name = "ExcluiAgenda")]
+        [HttpDelete("DeleteAgendaById{id}", Name = "DeleteAgendaById")]
         public async Task<ActionResult<Agenda>> Delete(int id)
         {
             var agenda = new Agenda { Id = id };

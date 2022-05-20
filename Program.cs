@@ -8,10 +8,11 @@ using SiginUser.Data.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
-string sqlConnectionConfiguration = builder.Configuration.GetConnectionString("SqlDbConnectionADO");
+var sqlConnectionConfiguration = new SqlConnectionConfiguration(
+               builder.Configuration.GetConnectionString("SqlDbContext"));
 builder.Services.AddSingleton(sqlConnectionConfiguration);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -20,7 +21,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
-//builder.Services.AddScoped<IAgendaService, AgendaService>();
+builder.Services.AddScoped<IAgendaService, AgendaService>();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();

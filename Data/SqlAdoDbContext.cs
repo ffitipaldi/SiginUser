@@ -2,10 +2,10 @@
 {
     public class SqlAdoDbContext
     {
-        public string ConnectioString { get; }
-        public SqlAdoDbContext(string connectioString)
+        public string ConnectionString { get; }
+        public SqlAdoDbContext(string connectionString)
         {
-            ConnectioString = connectioString;
+            ConnectionString = connectionString;
         }
     }
 }

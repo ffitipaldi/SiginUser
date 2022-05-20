@@ -6,9 +6,9 @@ namespace SiginUser.Data.Services
 {
     public class AgendaService : IAgendaService
     {
-        private readonly SqlAdoDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public AgendaService(SqlAdoDbContext context)
+        public AgendaService(ApplicationDbContext context)
         {
             this._context = context;
         }
