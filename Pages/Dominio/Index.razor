@@ -1,5 +1,6 @@
 ﻿@page "/dominio"
 @inject HttpClient http
+@inject NavigationManager navigate
 
 <PageTitle>Domínios</PageTitle>
 
@@ -16,7 +17,7 @@ else if(dominios.Length == 0)
 else
 {
     //exibir os Domínios
-    <table class="table">
+    <table class="table table-hover"  width="100%">
         <thead>
             <tr>
                 <th>Id</th>                 
@@ -29,7 +30,7 @@ else
         <tbody>
             @foreach(var dominio in dominios)
             {
-                <tr>
+                <tr @onclick="@(()=> EditaLinha(dominio.Id))">
                     <td>@dominio.Id</td>
                     <td>@dominio.Sequencia</td>
                     <td>@dominio.Campo</td>
@@ -54,5 +55,10 @@ else
     {
         http.BaseAddress = new Uri("https://localhost:7037");
         dominios = await http.GetFromJsonAsync<Dominio[]>("/api/dominio/GetDominios");
+    }
+
+    private void EditaLinha(int dominioId)
+    {
+        navigate.NavigateTo($"/dominio/editar/{dominioId}");
     }
 }

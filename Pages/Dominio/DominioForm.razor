@@ -1,0 +1,45 @@
+﻿<EditForm Model="@Dominio" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label form="nome">Campo: </label>
+        <div>
+            <InputText id="txtDominioCampo" @bind-Value="@Dominio.Campo" class="form-control" />
+            <ValidationMessage For="@(()=> Dominio.Campo)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label form="descricao">Descrição: </label>
+        <div>
+            <InputText @bind-Value="@Dominio.Descricao" class="form-control" />
+            <ValidationMessage For="@(()=> Dominio.Descricao)" />
+        </div>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-success">
+        @ButtonTextSubmit
+    </button>
+    <button class="btn btn-danger"
+            @onclick="@(()=> navigation.NavigateTo("dominio"))">
+       @ButtonTextCancelar
+    </button>
+</EditForm>
+@code{
+
+    [Inject]
+    public NavigationManager navigation { get; set; }
+
+    [Parameter]
+    public Dominio Dominio { get; set; }
+
+    [Parameter]
+    public string ButtonTextSubmit { get; set; } = "Salvar";
+
+    [Parameter]
+    public string ButtonTextCancelar { get; set; } = "Cancelar";
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+}

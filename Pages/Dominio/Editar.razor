@@ -1,0 +1,34 @@
+﻿@page "/dominio/editar/{dominioId:int}"
+@using SiginUser.Models
+@inject HttpClient  http
+@inject NavigationManager navigation
+@using SiginUser.Pages.Dominio
+
+<h2>Editar Domínio</h2>
+
+<DominioForm Dominio="@dominio" OnValidSubmit="@EditarDominio"
+               ButtonTextSubmit="Salvar" ButtonTextCancelar="Cancelar">
+
+</DominioForm>
+
+@code {
+
+    [Parameter]
+    public int dominioId { get; set; }
+
+    Dominio dominio = new Dominio();    
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+       http.BaseAddress = new Uri("https://localhost:7037");
+       dominio = await http.GetFromJsonAsync<Dominio>($"/api/dominio/{dominioId}");
+    }
+
+    async Task EditarDominio()
+    {
+        http.BaseAddress = new Uri("https://localhost:7037");
+        await http.PutAsJsonAsync("/api/dominio", dominio);
+        navigation.NavigateTo("dominio");
+    }
+}
