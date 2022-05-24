@@ -20,14 +20,12 @@ namespace SiginUser.Controllers
         }
 
         ///---------------------------------------------------------------------------------------------//
-        /// TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#
         /// <summary>
         /// GET:api/agenda/CpfProfisional/DataAgenda  -  Ler uma lita de Agendas pelos campos CPF e Data
         /// </summary>
         /// <param name="cpfprofissional">Cpf do Profissional</param>
         /// <returns>
         /// </returns>
-        /// TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#TESTE#
         ///---------------------------------------------------------------------------------------------//
         /// 
         [HttpGet("GetDataAgendasByCpf/{cpfprofissional}", Name = "GetDataAgendasByCpf")]
@@ -37,11 +35,15 @@ namespace SiginUser.Controllers
             using (SqlConnection con = new SqlConnection(_configuration.ConnectionString))
             {
                 const string query =
-                    "Select convert(varchar(10),DataAgenda, 103) as DataConsulta " +
-                    "From  Agendas " +
-                    "Where CpfProfissional = @CpfProfissional " +
-                    "Group by convert(varchar(10), DataAgenda, 103) " +
-                    "Order by DataConsulta ";
+                    "Set Language PORTUGUESE; " +
+                    "Select convert(DateTime, a.DtConsulta, 103) as DataConsulta " +
+                    "From( " +
+                    "    Select convert(varchar(10), DataAgenda, 111) as DtConsulta " +
+                    "    From Agendas " +
+                    "    Where CpfProfissional = @CpfProfissional " +
+                    "    Group by convert(varchar(10), DataAgenda, 111) " +
+                    ") as a " +
+                    "Order by a.DtConsulta ";
 
                 SqlCommand cmd = new SqlCommand(query, con)
                 {
@@ -56,8 +58,7 @@ namespace SiginUser.Controllers
                 {
                     DataAgendas dataagenda = new DataAgendas()
                     {
-                        DataAgenda = rdr["DataConsulta"].ToString() 
-                        //DataAgenda = (DateTime)rdr["DataConsulta"]
+                        DataAgenda = (DateTime)rdr["DataConsulta"]
                     };
                     dataAgendas.Add(dataagenda);
                 }

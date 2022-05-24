@@ -16,7 +16,7 @@ namespace SiginUser.Models
         public string Sigla { get; set; }
 
         [Required(ErrorMessage = "Campo Obrigatório")]
-        [MaxLength(30, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]
+        [MaxLength(512, ErrorMessage = "Campo limitado a 512 caracteres no máximo.")]
         public string Descricao { get; set; }
 
         [Required(ErrorMessage="Campo Obrigatório")]

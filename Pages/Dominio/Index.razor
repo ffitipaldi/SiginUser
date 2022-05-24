@@ -1,11 +1,58 @@
 ﻿@page "/dominio"
+@inject HttpClient http
 
 <PageTitle>Domínios</PageTitle>
 
 <h2>Domínios</h2>
 
+@if(dominios == null)
+{
+    <p>Carregando ...</p>
+}
+else if(dominios.Length == 0)
+{
+    <p>Não existem Domínios cadastrados</p>
+}
+else
+{
+    //exibir os Domínios
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>                 
+                <th>Sequencia</th> 
+                <th>Campo</th>
+                <th>Sigla</th>                
+                <th>Descrição</th>                           
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var dominio in dominios)
+            {
+                <tr>
+                    <td>@dominio.Id</td>
+                    <td>@dominio.Sequencia</td>
+                    <td>@dominio.Campo</td>
+                    <td>@dominio.Sigla</td>
+                    <td>@dominio.Descricao</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 
 @code {
+    Dominio[]? dominios { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await CarregaDominios();
+    }
+
+    async Task CarregaDominios()
+    {
+        http.BaseAddress = new Uri("https://localhost:7037");
+        dominios = await http.GetFromJsonAsync<Dominio[]>("/api/dominio/GetDominios");
+    }
 }

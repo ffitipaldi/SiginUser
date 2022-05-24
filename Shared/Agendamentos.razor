@@ -1,10 +1,37 @@
-﻿<h3>Agendamentos</h3>
+﻿@using SiginUser.Models.Consultas
+@using System.Globalization
+
+<h3>Agendamentos</h3>
 
 <!-- Agendamentos -->
 <div>
-    <span>Atendimentos agendados para @DataCorrente:</span>
-    <button class="btn btn-primary btn-sm" disabled>@TipoPerfil</button>
+    @if(listDtAgendas.Count == 0 )
+    {
+        <span>Não existem agendas a serem mostadas.</span>
+    }
+    else
+    {
+        <span>Atendimentos agendados para </span>
+        <select class="form-control-sm"> 
+        @for (var i = 0; i < listDtAgendas.Count; i++)
+        {
+            @if(listDtAgendas[i].DataAgenda.Date == DateTime.Now.Date)
+            {
+                <option selected>
+                    @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                </option> 
+            } 
+            else
+            {
+                <option>
+                    @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                </option>
+            }
+        }
+        </select>
+    }
 </div>
+
 
 <div class="row">
 
@@ -81,7 +108,29 @@
     </div>
 </div>
 
-@code {
-    private string DataCorrente = "Segunda-feira 09/05/2022";
+@code{
+
+    CultureInfo idioma = new CultureInfo("pt-BR");
+
+    public List<DataAgendas> listDtAgendas { get { return GetDatasAgendas(); } }
+
+    private  List<DataAgendas> GetDatasAgendas() => new List<DataAgendas>()
+        {
+            
+            new DataAgendas(){
+                DataAgenda =  new DateTime(2022, 5, 22)
+            },
+            new DataAgendas(){
+                DataAgenda = new DateTime(2022, 5, 23)
+            },
+            new DataAgendas(){
+                DataAgenda = new DateTime(2022, 5, 24)
+            },
+            new DataAgendas(){
+                DataAgenda = new DateTime(2022, 5, 25)
+            }
+        };
+
+    private string DataCorrente = "segunda-feira 09/05/2022";
     private string TipoPerfil = "Psicólogo";
 }

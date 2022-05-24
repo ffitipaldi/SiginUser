@@ -2,6 +2,6 @@
 {
     public class DataAgendas
     {
-        public string DataAgenda { get; set; }
+        public DateTime DataAgenda { get; set; }
     }
 }
