@@ -6,46 +6,56 @@
 <h2>Domínios</h2>
 
 <div>
-  <a class="btn btn-success" @onclick="@(()=> EditaLinha(0))">Novo Domínio</a>
+  <a class="btn btn-success" @onclick="@(()=> EditarLinha(0))">Novo Domínio</a>
 </div>
 
-@if(dominios == null)
+@if(flagSairDaEdicao == false)
 {
-    <p>Carregando ...</p>
-}
-else if(dominios.Length == 0)
-{
-    <p>Não existem Domínios cadastrados</p>
-}
-else
-{
-    //exibir os Domínios
-    <table class="table table-hover"  width="100%">
-        <thead>
-            <tr>
-                <th>Sequencia</th> 
-                <th>Campo</th>
-                <th>Sigla</th>                
-                <th>Descrição</th>                           
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var dominio in dominios)
-            {
-                <tr @onclick="@(()=> EditaLinha(dominio.Id))">
-                    <td>@dominio.Sequencia</td>
-                    <td>@dominio.Campo</td>
-                    <td>@dominio.Sigla</td>
-                    <td>@dominio.Descricao</td>
+    @if(dominios == null)
+    {
+        <p>Carregando ...</p>
+    }
+    else if(dominios.Length == 0)
+    {
+        <p>Não existem Domínios cadastrados</p>
+    }
+    else
+    {
+        //exibir os Domínios
+        <table class="table table-hover"  width="100%">
+            <thead>
+                <tr>
+                    <th>Sequencia</th> 
+                    <th>Campo</th>
+                    <th>Sigla</th>                
+                    <th>Descrição</th>                           
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach(var dominio in dominios)
+                {   
 
+                    <!-- teste usando o Navigation Manager utilizando o onclick() -->
+                    <tr @onclick="@(()=> EditarLinha(dominio.Id))"> 
+                        <td>@dominio.Sequencia</td>
+
+                    <!-- teste usando a navegação por HREF --> 
+                    <!-- <td><a href="dominio/editar/@dominio.Id">@dominio.Sequencia</a></td> -->
+                        <td>@dominio.Campo</td>
+                        <td>@dominio.Sigla</td>
+                        <td>@dominio.Descricao</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
 
 @code {
     Dominio[]? dominios { get; set; }
+
+    //flag utilizada para sair da edição ao se utilizar o NavigateTO
+    private bool flagSairDaEdicao = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,8 +68,9 @@ else
         dominios = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominios");
     }
 
-    private void EditaLinha(int dominioId)
+    private void EditarLinha(int dominioId)
     {
+        flagSairDaEdicao = true;
         navigate.NavigateTo($"/dominio/editar/{dominioId}");
     }
 }

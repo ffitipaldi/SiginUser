@@ -41,14 +41,16 @@
     <br/>
     <button type="submit" class="btn btn-success">Salvar</button>
     <button class="btn btn-danger" @onclick="@ExcluirDominio">Excluir</button>
-    <button class="btn btn-outline-dark" @onclick="@CancelarEdicaoDominio">Cancelar</button>
+    <button class="btn btn-outline-dark" @onclick="@CancelarEdicaoDominio">Retornar</button>
 </EditForm>
 
 @code {
 
     [Parameter]
     public int dominioId { get; set; }
-    public bool flagSair { get; set; } = true;
+
+    //flag utilizada para sair da edição ao se utilizar o NavigateTO
+    private bool flagSairDaEdicao = false;
 
     //instancia a classe Dominio no objeto dominio
     Dominio dominio = new Dominio();    
@@ -68,32 +70,39 @@
     async Task SalvarEdicaoDominio()
     {
         //salva o objeto dominio editado
-        if (dominioId == 0 && flagSair = true)
+        if (flagSairDaEdicao == false)
         {
-            //inclui
-            await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
-            navigation.NavigateTo("dominio");           
+            if (dominioId == 0)
+            {
+                //inclui
+                await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
+                navigation.NavigateTo("/dominio");
+            }
+            else
+            {
+                //altera
+                await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
+                navigation.NavigateTo("dominio");
+            }
         }
         else
         {
-            //altera
-            await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
-            navigation.NavigateTo("dominio");
+            navigation.NavigateTo("dominio");            
         }
     }
 
     async Task ExcluirDominio()
     {
         //exclui
+        flagSairDaEdicao = true;
         await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
-        flagSair = false;
         navigation.NavigateTo("dominio");
     }
 
     void CancelarEdicaoDominio()
     {
         //navega de volta para a pagina index
-        flagSair = false;
+        flagSairDaEdicao = true;
         navigation.NavigateTo("dominio");
     }
 }
