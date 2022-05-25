@@ -54,21 +54,33 @@
     protected async override Task OnParametersSetAsync()
     {
         //ler os dados do domínio a ser editado
-        http.BaseAddress = new Uri("https://localhost:7037/");
-        dominio = await http.GetFromJsonAsync<Dominio>($"api/dominio/GetDominioById/{dominioId}");
+        if( dominioId > 0)
+        {
+            http.BaseAddress = new Uri("https://localhost:7037/");
+            dominio = await http.GetFromJsonAsync<Dominio>($"api/dominio/GetDominioById/{dominioId}");
+        }
     }
 
     async Task SalvarEdicaoDominio()
     {
         //salva o objeto dominio editado
-        http.BaseAddress = new Uri("https://localhost:7037/");
-        await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
-        navigation.NavigateTo("dominio");
+        if (dominioId == 0)
+        {
+            //inclui
+            await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
+            navigation.NavigateTo("dominio");           
+        }
+        else
+        {
+            //altera
+            await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
+            navigation.NavigateTo("dominio");
+        }
     }
 
     void CancelarEdicaoDominio()
     {
         //navega de volta para a pagina index
-        navigation.NavigateTo("/");
+        navigation.NavigateTo("dominio");
     }
 }
