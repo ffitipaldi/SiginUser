@@ -3,6 +3,7 @@
 @inject HttpClient  http
 @inject NavigationManager navigation
 @using SiginUser.Pages.Dominio
+<PageTitle>Editar Domínios</PageTitle>
 
 <h2>Editar Domínio</h2>
 
@@ -54,9 +55,10 @@
     protected async override Task OnParametersSetAsync()
     {
         //ler os dados do domínio a ser editado
+        http.BaseAddress = new Uri("https://localhost:7037/");
+
         if( dominioId > 0)
         {
-            http.BaseAddress = new Uri("https://localhost:7037/");
             dominio = await http.GetFromJsonAsync<Dominio>($"api/dominio/GetDominioById/{dominioId}");
         }
     }
