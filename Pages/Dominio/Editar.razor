@@ -48,6 +48,7 @@
 
     [Parameter]
     public int dominioId { get; set; }
+    public bool flagSair { get; set; } = true;
 
     //instancia a classe Dominio no objeto dominio
     Dominio dominio = new Dominio();    
@@ -67,7 +68,7 @@
     async Task SalvarEdicaoDominio()
     {
         //salva o objeto dominio editado
-        if (dominioId == 0)
+        if (dominioId == 0 && flagSair = true)
         {
             //inclui
             await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
@@ -81,15 +82,18 @@
         }
     }
 
-    void CancelarEdicaoDominio()
+    async Task ExcluirDominio()
     {
-        //navega de volta para a pagina index
+        //exclui
+        await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
+        flagSair = false;
         navigation.NavigateTo("dominio");
     }
 
-        void ExcluirDominio()
+    void CancelarEdicaoDominio()
     {
         //navega de volta para a pagina index
+        flagSair = false;
         navigation.NavigateTo("dominio");
     }
 }
