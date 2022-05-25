@@ -6,9 +6,43 @@
 
 <h2>Editar Domínio</h2>
 
-<DominioForm Dominio="@dominio" OnValidSubmit="@EditarDominio">
-
-</DominioForm>
+<EditForm Model="@dominio" OnValidSubmit="@SalvarDominio">
+    <DataAnnotationsValidator />
+    
+    <div class="form-group">
+        <label form="campo">Campo</label>
+        <div>
+            <InputText @bind-Value="@dominio.Campo" class="form-control" />
+            <ValidationMessage For="@(()=>dominio.Campo)" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label form="sigla">Sigla</label>
+        <div>
+            <InputText @bind-Value="@dominio.Sigla" class="form-control" />
+            <ValidationMessage For="@(()=>dominio.Sigla)" />
+        </div>
+    </div>
+        <div class="form-group">
+        <label form="descricao">Descricao</label>
+        <div>
+            <InputText @bind-Value="@dominio.Descricao" class="form-control" />
+            <ValidationMessage For="@(()=>dominio.Descricao)" />
+        </div>
+    </div>
+        <div class="form-group">
+        <label form="sequencia">Sequência</label>
+        <div>
+            <InputNumber @bind-Value="@dominio.Sequencia" class="form-control" />
+            <ValidationMessage For="@(()=>dominio.Sequencia)" />
+        </div>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-success">Salvar</button>
+    <button class="btn btn-danger"
+            @onclick="@(()=> navigation.NavigateTo("dominio"))">
+            Cancelar
+    </button></EditForm>
 
 @code {
 
@@ -24,7 +58,7 @@
        dominio = await http.GetFromJsonAsync<Dominio>($"/api/dominio/GetDominioById/{dominioId}");
     }
 
-    async Task EditarDominio()
+    async Task SalvarDominio()
     {
         http.BaseAddress = new Uri("https://localhost:7037");
         await http.PutAsJsonAsync("/api/dominio/UpdateDominioById/{dominioId}", dominio);
