@@ -53,8 +53,8 @@ else
 
     async Task CarregaDominios()
     {
-        http.BaseAddress = new Uri("https://localhost:7037");
-        dominios = await http.GetFromJsonAsync<Dominio[]>("/api/dominio/GetDominios");
+        http.BaseAddress = new Uri("https://localhost:7037/");
+        dominios = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominios");
     }
 
     private void EditaLinha(int dominioId)

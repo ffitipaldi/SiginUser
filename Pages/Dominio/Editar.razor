@@ -6,7 +6,7 @@
 
 <h2>Editar Domínio</h2>
 
-<EditForm Model="@dominio" OnValidSubmit="@SalvarDominio">
+<EditForm Model="@dominio" OnValidSubmit="@SalvarEdicaoDominio">
     <DataAnnotationsValidator />
     
     <div class="form-group">
@@ -39,29 +39,36 @@
     </div>
     <br/>
     <button type="submit" class="btn btn-success">Salvar</button>
-    <button class="btn btn-danger"
-            @onclick="@(()=> navigation.NavigateTo("dominio"))">
-            Cancelar
-    </button></EditForm>
+    <button class="btn btn-danger" @onclick="@CancelarEdicaoDominio">Cancelar</button>
+</EditForm>
 
 @code {
 
     [Parameter]
     public int dominioId { get; set; }
 
+    //instancia a classe Dominio no objeto dominio
     Dominio dominio = new Dominio();    
 
 
     protected async override Task OnParametersSetAsync()
     {
-       http.BaseAddress = new Uri("https://localhost:7037");
-       dominio = await http.GetFromJsonAsync<Dominio>($"/api/dominio/GetDominioById/{dominioId}");
+        //ler os dados do domínio a ser editado
+        http.BaseAddress = new Uri("https://localhost:7037/");
+        dominio = await http.GetFromJsonAsync<Dominio>($"api/dominio/GetDominioById/{dominioId}");
     }
 
-    async Task SalvarDominio()
+    async Task SalvarEdicaoDominio()
     {
-        http.BaseAddress = new Uri("https://localhost:7037");
-        await http.PutAsJsonAsync("/api/dominio/UpdateDominioById/{dominioId}", dominio);
+        //salva o objeto dominio editado
+        http.BaseAddress = new Uri("https://localhost:7037/");
+        await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
         navigation.NavigateTo("dominio");
+    }
+
+    void CancelarEdicaoDominio()
+    {
+        //navega de volta para a pagina index
+        navigation.NavigateTo("/");
     }
 }
