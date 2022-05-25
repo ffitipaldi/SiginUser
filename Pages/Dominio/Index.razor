@@ -23,7 +23,6 @@ else
     <table class="table table-hover"  width="100%">
         <thead>
             <tr>
-                <th>Id</th>                 
                 <th>Sequencia</th> 
                 <th>Campo</th>
                 <th>Sigla</th>                
@@ -34,7 +33,6 @@ else
             @foreach(var dominio in dominios)
             {
                 <tr @onclick="@(()=> EditaLinha(dominio.Id))">
-                    <td>@dominio.Id</td>
                     <td>@dominio.Sequencia</td>
                     <td>@dominio.Campo</td>
                     <td>@dominio.Sigla</td>
