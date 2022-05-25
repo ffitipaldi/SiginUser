@@ -6,8 +6,7 @@
 
 <h2>Editar Domínio</h2>
 
-<DominioForm Dominio="@dominio" OnValidSubmit="@EditarDominio"
-               ButtonTextSubmit="Salvar" ButtonTextCancelar="Cancelar">
+<DominioForm Dominio="@dominio" OnValidSubmit="@EditarDominio">
 
 </DominioForm>
 
@@ -22,13 +21,13 @@
     protected async override Task OnParametersSetAsync()
     {
        http.BaseAddress = new Uri("https://localhost:7037");
-       dominio = await http.GetFromJsonAsync<Dominio>($"/api/dominio/{dominioId}");
+       dominio = await http.GetFromJsonAsync<Dominio>($"/api/dominio/GetDominioById/{dominioId}");
     }
 
     async Task EditarDominio()
     {
         http.BaseAddress = new Uri("https://localhost:7037");
-        await http.PutAsJsonAsync("/api/dominio", dominio);
+        await http.PutAsJsonAsync("/api/dominio/UpdateDominioById/{dominioId}", dominio);
         navigation.NavigateTo("dominio");
     }
 }

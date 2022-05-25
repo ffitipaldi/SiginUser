@@ -18,11 +18,11 @@
     </div>
     <br />
     <button type="submit" class="btn btn-success">
-        @ButtonTextSubmit
+            Salvar
     </button>
     <button class="btn btn-danger"
             @onclick="@(()=> navigation.NavigateTo("dominio"))">
-       @ButtonTextCancelar
+            Cancelar
     </button>
 </EditForm>
 @code{
@@ -32,12 +32,6 @@
 
     [Parameter]
     public Dominio Dominio { get; set; }
-
-    [Parameter]
-    public string ButtonTextSubmit { get; set; } = "Salvar";
-
-    [Parameter]
-    public string ButtonTextCancelar { get; set; } = "Cancelar";
 
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
