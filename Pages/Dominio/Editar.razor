@@ -3,10 +3,19 @@
 @inject HttpClient  http
 @inject NavigationManager navigation
 @using SiginUser.Pages.Dominio
-<PageTitle>Editar Domínios</PageTitle>
 
-<h2>Editar Domínio</h2>
+@if(dominioId == 0)
+{
+    <PageTitle>Novo Domínio</PageTitle>
+    <h2>Novo Domínio</h2>
+}
+else
+{
+    <PageTitle>Editar Domínios</PageTitle>
+    <h2>Editar Domínio</h2>
+}
 
+<!--formulário de edição para detalhamento, inclusão, alteração e exclusão -->
 <EditForm Model="@dominio" OnValidSubmit="@SalvarEdicaoDominio">
     <DataAnnotationsValidator />
     
@@ -76,19 +85,16 @@
             {
                 //inclui
                 await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
-                navigation.NavigateTo("/dominio");
             }
             else
             {
                 //altera
                 await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
-                navigation.NavigateTo("dominio");
             }
         }
-        else
-        {
-            navigation.NavigateTo("dominio");            
-        }
+        
+        //navega de volta apra a página index
+        navigation.NavigateTo("dominio");            
     }
 
     async Task ExcluirDominio()
@@ -96,13 +102,11 @@
         //exclui
         flagSairDaEdicao = true;
         await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
-        navigation.NavigateTo("dominio");
     }
 
     void CancelarEdicaoDominio()
     {
-        //navega de volta para a pagina index
+        //sai da edição e navega de volta para a pagina index
         flagSairDaEdicao = true;
-        navigation.NavigateTo("dominio",true);
     }
 }

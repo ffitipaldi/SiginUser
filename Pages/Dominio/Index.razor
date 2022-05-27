@@ -36,13 +36,8 @@
             <tbody>
                 @foreach(var dominio in dominios)
                 {   
-
-                    <!-- teste usando o Navigation Manager utilizando o onclick() -->
                     <tr @onclick="@(()=> EditarLinha(dominio.Id))"> 
                         <td>@dominio.Sequencia</td>
-
-                    <!-- teste usando a navegação por HREF --> 
-                    <!-- <td><a href="dominio/editar/@dominio.Id">@dominio.Sequencia</a></td> -->
                         <td>@dominio.Campo</td>
                         <td>@dominio.Sigla</td>
                         <td>@dominio.Descricao</td>
