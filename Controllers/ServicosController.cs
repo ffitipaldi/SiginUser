@@ -8,23 +8,32 @@ namespace SiginUser.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ConsultasController : Controller
+    public class ServicosController : Controller
     {
         //-------------------------------------------------//
         //Pega o contexto do banco de dados
         //-------------------------------------------------//
         private readonly SqlConnectionConfiguration _configuration;
-        public ConsultasController(SqlConnectionConfiguration configuration)
+        public ServicosController(SqlConnectionConfiguration configuration)
         {
             _configuration = configuration;
         }
 
         ///---------------------------------------------------------------------------------------------//
         /// <summary>
-        /// GET:api/agenda/CpfProfisional/DataAgenda  -  Ler uma lita de Agendas pelos campos CPF e Data
+        /// GET:api/Servicos/GetDataAgendasByCpf/{CpfProfisional}  
+        ///     Ler uma lista de Data de Agenda pertencentes ao CPF
         /// </summary>
         /// <param name="cpfprofissional">Cpf do Profissional</param>
         /// <returns>
+        ///     [
+        ///       {
+        ///         "dataAgenda": "2022-05-10T00:00:00"
+        ///       },
+        ///       {
+        ///         "dataAgenda": "2022-06-25T00:00:00"
+        ///       }
+        ///     ]
         /// </returns>
         ///---------------------------------------------------------------------------------------------//
         /// 
@@ -35,15 +44,11 @@ namespace SiginUser.Controllers
             using (SqlConnection con = new SqlConnection(_configuration.ConnectionString))
             {
                 const string query =
-                    "Set Language PORTUGUESE; " +
-                    "Select convert(DateTime, a.DtConsulta, 103) as DataConsulta " +
-                    "From( " +
-                    "    Select convert(varchar(10), DataAgenda, 111) as DtConsulta " +
-                    "    From Agendas " +
-                    "    Where CpfProfissional = @CpfProfissional " +
-                    "    Group by convert(varchar(10), DataAgenda, 111) " +
-                    ") as a " +
-                    "Order by a.DtConsulta ";
+                    "Select  CAST(DataAgenda AS DATE) as DataConsulta " +
+                    "From Agendas " +
+                    "Where CpfProfissional = @CpfProfissional " +
+                    "Group by  CAST(DataAgenda AS DATE) " +
+                    "Order by DataConsulta ";
 
                 SqlCommand cmd = new SqlCommand(query, con)
                 {
