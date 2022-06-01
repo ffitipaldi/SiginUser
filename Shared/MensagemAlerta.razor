@@ -1,0 +1,31 @@
+﻿<!-- Componente de alerta de mensagens                                                  -->
+<!-- Chamada:                                                                           -->
+<!-- <MensagemAlerta flagExibirMensagem=true mensagemAlerta="Mensagem a ser exibida." />-->
+<!--   flagExibirMensagem: bool true/false                                              -->
+<!--   mensagemAlerta: string com  mensagem a ser exibida                               -->
+
+<!-- converte true/false para block/none-->
+@if(flagExibirMensagem == true) 
+    {displayMensagem = "block";}
+else{displayMensagem = "none";}
+
+<!-- exibe alerta com mensagem-->
+<div class="alert alert-secondary mt-4 alert-dismissible" 
+    role="alert" 
+    style="display:@displayMensagem" 
+    @onclick="@DesligaMensagemAlerta">
+    <span class="oi oi-warning me-2" style="color:red" aria-hidden="true"></span>
+    @mensagemAlerta
+    <button class="btn-close" data-bs-dismiss="alert" />
+</div> 
+
+@code {
+    [Parameter] public bool flagExibirMensagem { get; set; }
+    [Parameter] public string? mensagemAlerta { get; set; }
+    private string? displayMensagem;
+
+    void DesligaMensagemAlerta()
+    {
+        flagExibirMensagem = false;
+    }
+}

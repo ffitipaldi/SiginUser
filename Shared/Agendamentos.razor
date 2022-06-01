@@ -1,38 +1,9 @@
 ﻿@using SiginUser.Models.Consultas
 @using System.Globalization
 
-<h3>Agendamentos</h3>
+
 
 <!-- Agendamentos -->
-<div>
-    @if(listDtAgendas.Count == 0 )
-    {
-        <span>Não existem agendas a serem mostadas.</span>
-    }
-    else
-    {
-        <span>Atendimentos agendados para </span>
-        <select class="form-control-sm"> 
-        @for (var i = 0; i < listDtAgendas.Count; i++)
-        {
-            @if(listDtAgendas[i].DataAgenda.Date == DateTime.Now.Date)
-            {
-                <option selected>
-                    @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
-                </option> 
-            } 
-            else
-            {
-                <option>
-                    @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
-                </option>
-            }
-        }
-        </select>
-    }
-</div>
-
-
 <div class="row">
 
     <!-- Detalhe dos agendamentos - tabela a esquerda -->

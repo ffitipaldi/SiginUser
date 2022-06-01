@@ -6,8 +6,9 @@
 <h2>Domínios</h2>
 
 <div>
-    <a class="btn btn-info float-end"  
-        @onclick="@(()=> EditarLinha(0))">Novo Domínio
+    <!--chama a função de edição com Id=0 -->
+    <a class="btn btn-info float-end" @onclick="@(()=> EditarLinha(0))">
+        Novo Domínio"  
     </a>
 </div>
 
@@ -49,6 +50,7 @@
 }
 
 @code {
+    //instancia um array da classe "Dominios" no objeto "dominios"
     Dominio[]? dominios { get; set; }
 
     //flag utilizada para sair da edição ao se utilizar o NavigateTO
@@ -61,6 +63,7 @@
 
     async Task CarregaDominios()
     {
+        //ler do banco e carrega o objeto "dominios"
         http.BaseAddress = new Uri("https://localhost:7037/");
         dominios = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominios");
     }

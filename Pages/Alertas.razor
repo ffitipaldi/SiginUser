@@ -1,14 +1,32 @@
 ﻿@page "/Alertas"
+
 <h3>Alertas</h3>
 
-<div class="alert alert-danger alert-dismissible" role="alert">
-  Como é dificil fazer um ALERT funcionar!
+<div class="alert alert-danger alert-dismissible" 
+     role="alert" 
+     id="divAlertBootstrap"
+     visible="@flagExibirMensagemAlerta" @onclick="@DesligaMensagemAlerta" >
+  Como é dificil fazer um ALERT funcionar! - @mensagemAlerta
   <button class="btn-close" data-bs-dismiss="alert" />
 </div>
+
+<!-- Alerta de mensagens agendadas para hoje-->
+<MensagemAlerta flagExibirMensagem=true mensagemAlerta="Mensagem editada na pagina Alerta." />
 
 
 
 
 @code {
 
+    public bool flagExibirMensagemAlerta = true;
+    public string? mensagemAlerta;
+
+
+    void DesligaMensagemAlerta()
+    {   
+        flagExibirMensagemAlerta = false;
+        mensagemAlerta = "Mensagem editada na pagina Alerta.";
+    }
 }
+
+

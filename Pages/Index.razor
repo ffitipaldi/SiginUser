@@ -1,12 +1,16 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Identity
+@using SiginUser.Models.Consultas
+@using System.Globalization
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager navigation
+@inject HttpClient http
 
+<PageTitle>Via Rápida</PageTitle>
 
-<PageTitle>Index</PageTitle>
 
 <div class="page">
+
     <!-- logotipo da Clínica -->
     <table>
         <tr>
@@ -20,14 +24,47 @@
         </tr>
     </table>
 
-    <!-- Alerta de agendamentos -->
-    <div class="alert alert-secondary mt-4">
-        <span class="oi oi-aperture me-2" aria-hidden="true"></span>
-        Olá @UserName.
-        Você tem atendimentos agendados para hoje.
+    <!-- Alerta de mensagens agendadas para hoje-->
+    <MensagemAlerta flagExibirMensagem=@flagExibirMensagem mensagemAlerta=@mensagemAlerta />
+
+    <h3 class="mt-4">Agendamentos</h3>
+
+    <!-- Busca as datas agendadas -->    
+    <div>
+        @if (listDtAgendas == null)
+        {
+            <span>Não existem agendas a serem mostradas.</span>
+        }
+        else
+        {
+            <span>Atendimentos agendados para </span>
+            <select class="form-control-sm">
+
+                //ler o array de datas com o "for" e monta um listbox(select)
+                @for (var i = 0; i < listDtAgendas.Length; i++)
+                {
+                    @if (listDtAgendas[i].DataAgenda.Date == DateTime.Now.Date)
+                    {
+                        <option selected>
+                            @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                        </option>
+                        flagExibirMensagem = true;
+                        mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";                      
+
+                    }
+                    else
+                    {
+                        <option>
+                            @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                        </option>
+                    }
+                }
+            </select>
+        }
     </div>
 
-    <!-- Agendaentos -->
+
+    <!--lista os agendamentos marcados na data específica -->
     <Agendamentos />
 
 </div>
@@ -50,18 +87,55 @@
 }*@
 @code
 {
-    [CascadingParameter]
-    private Task<AuthenticationState> _authState { get; set; }
-    private AuthenticationState authState;
+    CultureInfo idioma = new CultureInfo("pt-BR");
+    private string TipoPerfil = "Psicólogo";    
+    private string CpfProfisional = "25586149400";
     private string UserName = "Fernando Fitipaldi";
+    public string mensagemAlerta = "Existem agendamentos marcados hoje para você!";
+    public bool flagExibirMensagem = false;
+
+    [CascadingParameter]
+    private Task
+    <AuthenticationState> _authState { get; set; }
+    private AuthenticationState authState;
+
+    //instancia uma lista da classe "DataAgendas" no objeto "listDtAgendas"
+    DataAgendas[]? listDtAgendas { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        //estado de autenticação do usuário
         authState = await _authState;
-
         if (authState.User.Identity.IsAuthenticated == false)
         {
             navigation.NavigateTo("/Identity/Account/Login", true);
         }
+
+        //carrega as datas das agendas
+        await GetDatasAgendas();
+        VerificaAgendaParaHoje();
+    }
+    async Task GetDatasAgendas()
+    {
+        //ler do banco e carrega o objeto "listDtAgendas"
+        http.BaseAddress = new Uri("https://localhost:7037/");
+        listDtAgendas = await http.GetFromJsonAsync<DataAgendas[]>($"api/servicos/GetDataAgendasByCpf/{CpfProfisional}");  
+    }
+
+    void VerificaAgendaParaHoje()
+    {
+        foreach (var dtAgenda in listDtAgendas)
+        {
+            if (dtAgenda.DataAgenda.Date == DateTime.Now.Date)
+            {
+                flagExibirMensagem = true;
+                mensagemAlerta = "Você tem agendamentos marcados para hoje!";
+            }
+        }
+    }
+
+    void DesligaMensagemAlerta()
+    {
+        flagExibirMensagem = false;
     }
 }

@@ -3,6 +3,6 @@ Set Language PORTUGUESE;
 
 Select  CAST(DataAgenda AS DATE) as DataConsulta
 From Agendas
-Where CpfProfissional = '30381498883'
+Where CpfProfissional = '25586149400'
 Group by  CAST(DataAgenda AS DATE)
 Order by DataConsulta
