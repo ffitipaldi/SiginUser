@@ -8,67 +8,77 @@
 
 <PageTitle>Via Rápida</PageTitle>
 
+@if(listDtAgendas != null)
+{
+    <div class="page">
 
-<div class="page">
+        <!-- logotipo da Clínica -->
+        <table>
+            <tr>
+                <td><img src="/images/LogoMedio.png" width="80" /></td>
+                <td>
+                    <table>
+                        <tr><td><img src="/images/ViaRapida.png" width="180" /></td></tr>
+                        <tr><td><span><b>Clínica de Medicina e Psicologia do Trânsito</b></span></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
 
-    <!-- logotipo da Clínica -->
-    <table>
-        <tr>
-            <td><img src="/images/LogoMedio.png" width="80" /></td>
-            <td>
-                <table>
-                    <tr><td><img src="/images/ViaRapida.png" width="180" /></td></tr>
-                    <tr><td><span><b>Clínica de Medicina e Psicologia do Trânsito</b></span></td></tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+        <!-- Alerta de mensagens agendadas para hoje-->
+        <MensagemAlerta flagExibirMensagem=@flagExibirMensagem 
+                        mensagemAlerta=@mensagemAlerta />
 
-    <!-- Alerta de mensagens agendadas para hoje-->
-    <MensagemAlerta flagExibirMensagem=@flagExibirMensagem mensagemAlerta=@mensagemAlerta />
+        <h3 class="mt-4">Agendamentos</h3>
 
-    <h3 class="mt-4">Agendamentos</h3>
+        <!-- Monta Listbox com as datas agendadas -->    
+        <div>
+            @if (listDtAgendas == null)
+            {
+                <span>Não existem agendas a serem mostradas.</span>
+            }
+            else
+            {
+                <span>Atendimentos agendados para </span>
+                <select class="form-control-sm" @bind="dataSelecionada">
 
-    <!-- Busca as datas agendadas -->    
-    <div>
-        @if (listDtAgendas == null)
-        {
-            <span>Não existem agendas a serem mostradas.</span>
-        }
-        else
-        {
-            <span>Atendimentos agendados para </span>
-            <select class="form-control-sm">
-
-                //ler o array de datas com o "for" e monta um listbox(select)
-                @for (var i = 0; i < listDtAgendas.Length; i++)
-                {
-                    @if (listDtAgendas[i].DataAgenda.Date == DateTime.Now.Date)
+                    //ler o array de datas com o "foreach" e monta um listbox(select)
+                    @foreach (var dtAgenda in listDtAgendas)
                     {
-                        <option selected>
-                            @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
-                        </option>
-                        flagExibirMensagem = true;
-                        mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";                      
+                        //seleciona automaticamente a data corrente
+                        @if (dtAgenda.DataAgenda.Date == DateTime.Now.Date)
+                        {
+                            <option value="@dtAgenda.DataAgenda" selected>
+                                @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                            </option>
+                            flagExibirMensagem = true;
+                            mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
+                        }
+                        else
+                        {
+                            //monta demais datas
+                            <option value="@dtAgenda.DataAgenda">
+                                @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                            </option>
+                        }
+                    }
+                </select>
+            }
+        </div>
 
-                    }
-                    else
-                    {
-                        <option>
-                            @listDtAgendas[i].DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
-                        </option>
-                    }
-                }
-            </select>
+        <!-- conta quantas vezes passa por aqui-->
+        @if (1 == 1) 
+        {   
+            conta = conta + 1;
+            dtsel = dtsel + " | " + dataSelecionada.ToString("d");
         }
+        Passei por aqui @conta vezes com as datas @dtsel
+
+        <!--lista os agendamentos marcados na data específica -->
+        <Agendamentos />
+
     </div>
-
-
-    <!--lista os agendamentos marcados na data específica -->
-    <Agendamentos />
-
-</div>
-
+}
 <!-- lista o estado de autentiação do usuário -->
 @*@if(@authState.User.Identity.IsAuthenticated)
 {
@@ -93,6 +103,9 @@
     private string UserName = "Fernando Fitipaldi";
     public string mensagemAlerta = "Existem agendamentos marcados hoje para você!";
     public bool flagExibirMensagem = false;
+    public DateTime dataSelecionada;
+    public int conta;
+    public string? dtsel;
 
     [CascadingParameter]
     private Task
@@ -130,6 +143,7 @@
             {
                 flagExibirMensagem = true;
                 mensagemAlerta = "Você tem agendamentos marcados para hoje!";
+                dataSelecionada = dtAgenda.DataAgenda;
             }
         }
     }
