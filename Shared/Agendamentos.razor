@@ -1,9 +1,9 @@
 ﻿@using SiginUser.Models.Consultas
 @using System.Globalization
-
-
+@inject HttpClient http
 
 <!-- Agendamentos -->
+<div>@cpfProfissional | @dtAgenda  </div> 
 <div class="row">
 
     <!-- Detalhe dos agendamentos - tabela a esquerda -->
@@ -19,7 +19,7 @@
             <tbody>
                 <tr>
                     <th scope="row">08:00</th>
-                    <td>Francisco de Assis Moura</td>
+                    <td>Francisca de Assis Moura</td>
                     <td>(11) 93240-3415</td>
                     @*<td><span class="oi oi-check me-2" aria-hidden="true"></span></td>*@
                 </tr>
@@ -82,26 +82,16 @@
 @code{
 
     CultureInfo idioma = new CultureInfo("pt-BR");
+    [Parameter] public string cpfProfissional { get; set; }
+    [Parameter] public DateTime dtAgenda { get; set; }
 
-    public List<DataAgendas> listDtAgendas { get { return GetDatasAgendas(); } }
+    public Agenda[] listAgendas { get; set; } 
 
-    private  List<DataAgendas> GetDatasAgendas() => new List<DataAgendas>()
-        {
-            
-            new DataAgendas(){
-                DataAgenda =  new DateTime(2022, 5, 22)
-            },
-            new DataAgendas(){
-                DataAgenda = new DateTime(2022, 5, 23)
-            },
-            new DataAgendas(){
-                DataAgenda = new DateTime(2022, 5, 24)
-            },
-            new DataAgendas(){
-                DataAgenda = new DateTime(2022, 5, 25)
-            }
-        };
-
-    private string DataCorrente = "segunda-feira 09/05/2022";
-    private string TipoPerfil = "Psicólogo";
+    protected override async Task OnInitializedAsync()
+    //async Task GetAgendasByData()
+    {
+        //ler do banco e carrega o objeto "listAgendas"
+        //http.BaseAddress = new Uri("https://localhost:7037/");
+        //listAgendas = await http.GetFromJsonAsync<Agenda[]>($"api/servicos/GetDataAgendasByCpfData/25586149400/2022-06-01/2022-06-01");  
+    }
 }

@@ -12,7 +12,9 @@
 {
     <div class="page">
 
+        <!------------------------->
         <!-- logotipo da Clínica -->
+        <!------------------------->
         <table>
             <tr>
                 <td><img src="/images/LogoMedio.png" width="80" /></td>
@@ -25,13 +27,17 @@
             </tr>
         </table>
 
+        <!-------------------------------------------->
         <!-- Alerta de mensagens agendadas para hoje-->
+        <!-------------------------------------------->
         <MensagemAlerta flagExibirMensagem=@flagExibirMensagem 
                         mensagemAlerta=@mensagemAlerta />
 
         <h3 class="mt-4">Agendamentos</h3>
 
+        <!------------------------------------------>
         <!-- Monta Listbox com as datas agendadas -->    
+        <!------------------------------------------>
         <div>
             @if (listDtAgendas == null)
             {
@@ -40,7 +46,7 @@
             else
             {
                 <span>Atendimentos agendados para </span>
-                <select class="form-control-sm" @bind="dataSelecionada">
+                <select class="form-control-sm" @onchange="@OnChangeDtAgenda" > <!--@bind="dataSelecionada-->
 
                     //ler o array de datas com o "foreach" e monta um listbox(select)
                     @foreach (var dtAgenda in listDtAgendas)
@@ -48,16 +54,17 @@
                         //seleciona automaticamente a data corrente
                         @if (dtAgenda.DataAgenda.Date == DateTime.Now.Date)
                         {
-                            <option value="@dtAgenda.DataAgenda" selected>
+                            <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")" selected>
                                 @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
                             </option>
                             flagExibirMensagem = true;
                             mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
+
                         }
                         else
                         {
                             //monta demais datas
-                            <option value="@dtAgenda.DataAgenda">
+                            <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")">
                                 @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
                             </option>
                         }
@@ -66,35 +73,60 @@
             }
         </div>
 
-        <!-- conta quantas vezes passa por aqui-->
-        @if (1 == 1) 
-        {   
-            conta = conta + 1;
-            dtsel = dtsel + " | " + dataSelecionada.ToString("d");
-        }
-        Passei por aqui @conta vezes com as datas @dtsel
-
+        <!------------------------------------------------------>
         <!--lista os agendamentos marcados na data específica -->
-        <Agendamentos />
+        <!------------------------------------------------------>
+        @if (listResumoAgendas != null)
+        {
+            <div class="row">
 
+                <!-- Detalhe dos agendamentos - tabela a esquerda -->
+                <div class="col-sm">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Hora</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Telefone</th>
+                                <th scope="col">Obs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var linhaAgenda in listResumoAgendas)
+                            {
+                                <!--determina a cor da linha de acordo com o status-->
+                                @if(linhaAgenda.StatusExPsicoSigla == "APTO"){ trcolor = "lime"; }
+                                else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO"){ trcolor = "cadetblue"; }
+                                else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR"){ trcolor = "black"; }
+                                else @if(linhaAgenda.StatusExPsicoSigla == "CANC"){ trcolor = "red"; }
+                                else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO"){ trcolor = "blue"; }  
+                                
+                                <!--desenha a tabela de linhas da agenda-->
+                                <tr style="color:@trcolor">
+                                    <td>@linhaAgenda.HoraAgenda</td>
+                                    <td>@linhaAgenda.NomeCandidato</td>
+                                    <td>@linhaAgenda.Telefone</td>
+                                    <td>@if(linhaAgenda.StatusExPsicoSigla == "APTO")
+                                            {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
+                                        else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO")
+                                            {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
+                                        else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR")
+                                            {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
+                                        else @if(linhaAgenda.StatusExPsicoSigla == "CANC")
+                                            {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
+                                        else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO")
+                                            {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
+                                    </td>
+                                 </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
     </div>
 }
-<!-- lista o estado de autentiação do usuário -->
-@*@if(@authState.User.Identity.IsAuthenticated)
-{
-	<div><p><b>authState:</b>@authState</p></div>
-	<div class="row">
-		<div class="col-6"><p><b>Nome:</b> @authState.User.Identity.Name</p></div>
-		<div class="col-6"><p><b>Autenticado:</b> @authState.User.Identity.IsAuthenticated</p></div>
-	</div>
-			
-	@foreach (var claim in authState.User.Claims)
-	{   <div class="row">
-			<div class="col-6"><p><b>Claim Type:</b> @claim.Type</p></div> 
-			<div class="col-6"><p><b>Claim Value:</b> @claim.Value</p></div>
-		</div>
-	}
-}*@
+
 @code
 {
     CultureInfo idioma = new CultureInfo("pt-BR");
@@ -104,8 +136,7 @@
     public string mensagemAlerta = "Existem agendamentos marcados hoje para você!";
     public bool flagExibirMensagem = false;
     public DateTime dataSelecionada;
-    public int conta;
-    public string? dtsel;
+    public string? trcolor;
 
     [CascadingParameter]
     private Task
@@ -113,8 +144,21 @@
     private AuthenticationState authState;
 
     //instancia uma lista da classe "DataAgendas" no objeto "listDtAgendas"
-    DataAgendas[]? listDtAgendas { get; set; }
+    public DataAgendas[]? listDtAgendas { get; set; }
 
+    //instancia um array do Resumo Agenda no objeto listResumoAgendas
+    public ResumoAgendas[]? listResumoAgendas { get; set; } 
+
+    //instancia um array da classe Agenda no objeto listAgendas
+    public Agenda[]? listAgendas { get; set; } 
+
+    /// ---------------------------------------------------------
+    /// <summary>
+    /// carrega o listbox com as datas das agendas
+    /// </summary>
+    /// <returns></returns>
+    /// ---------------------------------------------------------
+    /// 
     protected override async Task OnInitializedAsync()
     {
         //estado de autenticação do usuário
@@ -128,6 +172,14 @@
         await GetDatasAgendas();
         VerificaAgendaParaHoje();
     }
+
+    /// --------------------------------------------------
+    /// <summary>
+    /// chama a API para carga das datas das agendas
+    /// </summary>
+    /// <returns></returns>
+    /// --------------------------------------------------
+    /// 
     async Task GetDatasAgendas()
     {
         //ler do banco e carrega o objeto "listDtAgendas"
@@ -135,6 +187,13 @@
         listDtAgendas = await http.GetFromJsonAsync<DataAgendas[]>($"api/servicos/GetDataAgendasByCpf/{CpfProfisional}");  
     }
 
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// verifica se tem agenda para hoje e marcar no listbox
+    /// </summary>
+    ///--------------------------------------------------------
+    ///
     void VerificaAgendaParaHoje()
     {
         foreach (var dtAgenda in listDtAgendas)
@@ -148,8 +207,67 @@
         }
     }
 
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// Rotina de troca de datas no listbox
+    /// </summary>
+    /// <param name="changeEventArgs"></param>
+    /// <returns></returns>
+    ///--------------------------------------------------------
+    ///
+    async Task OnChangeDtAgenda(ChangeEventArgs changeEventArgs)
+    {
+        dataSelecionada = Convert.ToDateTime(changeEventArgs.Value.ToString());
+        await GetResumoAgendasByCpfData(CpfProfisional, changeEventArgs.Value.ToString(), changeEventArgs.Value.ToString());
+    }
+
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// Carrega lista de resumos de agendas
+    /// </summary>
+    /// <param name="cpfProfissional"></param>
+    /// <param name="dtAgendaDe"></param>
+    /// <param name="dtAgendaAte"></param>
+    /// <returns></returns>
+    ///--------------------------------------------------------
+    ///
+    async Task GetResumoAgendasByCpfData(string cpfProfissional, string dtAgendaDe, string dtAgendaAte)
+    {
+        //ler do banco e carrega o array de resumo de agendas
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+        listResumoAgendas = await http.GetFromJsonAsync<ResumoAgendas[]>($"api/servicos/GetResumoAgendasByCpfData/{cpfProfissional}/{dtAgendaDe}/{dtAgendaAte}");  
+    }
+
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// Carrega agendas da data selecionada
+    /// </summary>
+    /// <param name="cpfProfissional"></param>
+    /// <param name="dtAgendaDe"></param>
+    /// <param name="dtAgendaAte"></param>
+    /// <returns></returns>
+    ///--------------------------------------------------------
+    ///
+    async Task GetAgendasByCpfData(string cpfProfissional, string dtAgendaDe, string dtAgendaAte)
+    {
+        //ler do banco e carrega o array de agendas
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+        listAgendas = await http.GetFromJsonAsync<Agenda[]>($"api/agenda/GetAgendasByCpfData/{cpfProfissional}/{dtAgendaDe}/{dtAgendaAte}");  
+    }
+
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// desliga a mensagem de alerta
+    /// </summary>
+    ///--------------------------------------------------------
+    ///
     void DesligaMensagemAlerta()
     {
         flagExibirMensagem = false;
     }
+
 }

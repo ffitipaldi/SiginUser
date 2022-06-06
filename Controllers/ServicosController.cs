@@ -71,5 +71,58 @@ namespace SiginUser.Controllers
             }
             return dataAgendas;
         }
+
+
+        /// <summary>
+        /// Retorna um array de resumo de agendas
+        /// </summary>
+        /// <param name="cpfprofissional"></param>
+        /// <param name="datade"></param>
+        /// <param name="dataate"></param>
+        /// <returns></returns>
+        [HttpGet("GetResumoAgendasByCpfData/{cpfprofissional}/{datade}/{dataate}", Name = "GetResumoAgendasByCpfData")]
+        public async Task<ActionResult<List<ResumoAgendas>>> GetResumoAgendasByCpfData(string cpfprofissional, string datade, string dataate)
+        {
+            List<ResumoAgendas> resumoAgendas = new List<ResumoAgendas>();
+            using (SqlConnection con = new SqlConnection(_configuration.ConnectionString))
+            {
+                const string query =
+                    "Select  Id, " +
+		            "        HoraAgenda, " +
+		            "        NomeCandidato, " +
+		            "        Telefone, " +
+		            "        StatusExPsico " +
+                    "From Agendas " +
+                    "Where CpfProfissional = @CpfProfissional " +
+                    "    AND CAST(DataAgenda AS DATE) BETWEEN CAST(@DataDE as DATE) AND CAST(@DataATE as DATE) " +
+                    "Order by DataAgenda ";
+
+                SqlCommand cmd = new SqlCommand(query, con)
+                {
+                    CommandType = CommandType.Text
+                };
+                cmd.Parameters.AddWithValue("@CpfProfissional", cpfprofissional);
+                cmd.Parameters.AddWithValue("@DataDE", datade);
+                cmd.Parameters.AddWithValue("@DataATE", dataate);
+
+                con.Open();
+                SqlDataReader rdr = await cmd.ExecuteReaderAsync();
+
+                while (rdr.Read())
+                {
+                    ResumoAgendas resumoagenda = new ResumoAgendas()
+                    {
+                        IdAgenda = (int)rdr["Id"],
+                        HoraAgenda = (string)rdr["HoraAgenda"],
+                        NomeCandidato = (string)rdr["NomeCandidato"],
+                        Telefone = (string)rdr["Telefone"],
+                        StatusExPsicoSigla = (string)rdr["StatusExPsico"]
+                    };
+                    resumoAgendas.Add(resumoagenda);
+                }
+                cmd.Dispose();
+            }
+            return resumoAgendas;
+        }       
     }
 }
