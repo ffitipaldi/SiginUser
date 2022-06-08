@@ -51,6 +51,18 @@ else
             </div>
         </div>
         <div class="form-group">
+            <label style="color:gray">Procedimento</label>
+            <div>
+                <InputSelect @bind-Value="agenda.TipoProcesso" class="form-control-sm">
+                @foreach (var tpprocesso in listTipoProcessos)
+                {
+                    <option value="@tpprocesso.Sigla">@tpprocesso.Descricao</option>
+                }
+                </InputSelect>
+                <ValidationMessage For="@(()=>agenda.TipoProcesso)" />
+            </div>
+        </div>
+        <div class="form-group">
             <label style="color:gray">Status Exame</label>
             <div>
                 <InputSelect @bind-Value="agenda.StatusExPsico" class="form-control-sm">
@@ -60,13 +72,19 @@ else
                 }
                 </InputSelect>
                 <ValidationMessage For="@(()=>agenda.StatusExPsico)" />
-
+            </div>
+        </div>
+        <div class="form-group">
+            <label form="DataAgenda" style="color:gray">Data Original Detran</label>
+            <div>
+                <InputDate @bind-Value="@agenda.DataAgendaDetran" class="form-control" readonly="readonly" />
+                <ValidationMessage For="@(()=>agenda.DataAgendaDetran)" />
             </div>
         </div>
         <br/>
         <button type="submit" class="btn btn-success">Salvar</button>
         <button class="btn btn-danger" @onclick="@ExcluirAgenda">Excluir</button>
-        <button class="btn btn-outline-dark" href="/">Retornar</button>
+        <button class="btn btn-outline-dark" @onclick="@RetornaAgenda">Retornar</button>
     </EditForm>
 }
 @code {
@@ -80,8 +98,11 @@ else
     //instancia a classe Agenda no objeto agenda
     Agenda agenda = new Agenda();
 
-    //instancia a classe StatusExames como objeto listStatusExames
+    //instancia a classe Dominio como objeto listStatusExames
     public Dominio[]? listStatusExames { get; set; }
+
+    //instancia a classe Dominio como objeto listStatusExames
+    public Dominio[]? listTipoProcessos { get; set; }
 
     //data anterior a edição
     public DateTime dataAgendaAntes;
@@ -100,6 +121,9 @@ else
 
         //carrega listbox com os status dos exames
         listStatusExames = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominiosByCampo/StatusExame");
+
+        //carrega listbox com os tipos de processos
+        listTipoProcessos = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominiosByCampo/TipoProcesso");
 
         if( agendaId > 0)
         {
@@ -203,5 +227,19 @@ else
         //exclui
         flagSairDaEdicao = true;
         await http.DeleteAsync($"api/agenda/DeleteAgendaById/{agendaId}");
+    }
+
+    
+    /// ----------------------------------------------
+    /// <summary>
+    /// retorna a tela anterior
+    /// </summary>
+    /// <returns></returns>
+    /// ----------------------------------------------
+    /// 
+    void RetornaAgenda()
+    {
+        //exclui
+        flagSairDaEdicao = true;
     }
 }
