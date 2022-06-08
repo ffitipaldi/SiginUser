@@ -1,10 +1,12 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc
 @using SiginUser.Models.Consultas
 @using System.Globalization
 @inject SignInManager<IdentityUser> SignInManager
-@inject NavigationManager navigation
+@inject NavigationManager navigate
 @inject HttpClient http
+
 
 <PageTitle>Via Rápida</PageTitle>
 
@@ -51,14 +53,14 @@
                     //ler o array de datas com o "foreach" e monta um listbox(select)
                     @foreach (var dtAgenda in listDtAgendas)
                     {
-                        //seleciona automaticamente a data corrente
-                        @if (dtAgenda.DataAgenda.Date == DateTime.Now.Date)
+                        //seleciona automaticamente a data corrente ou maior
+                        @if (dtAgenda.DataAgenda.Date == dataSelecionada)
                         {
                             <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")" selected>
                                 @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
                             </option>
-                            flagExibirMensagem = true;
-                            mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
+                            //flagExibirMensagem = true;
+                            //mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
 
                         }
                         else
@@ -95,14 +97,14 @@
                             @foreach(var linhaAgenda in listResumoAgendas)
                             {
                                 <!--determina a cor da linha de acordo com o status-->
-                                @if(linhaAgenda.StatusExPsicoSigla == "APTO"){ trcolor = "lime"; }
-                                else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO"){ trcolor = "cadetblue"; }
-                                else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR"){ trcolor = "black"; }
-                                else @if(linhaAgenda.StatusExPsicoSigla == "CANC"){ trcolor = "red"; }
-                                else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO"){ trcolor = "blue"; }  
+                                @if(linhaAgenda.StatusExPsicoSigla == "APTO") trcolor = "lime"; 
+                                else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
+                                else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
+                                else @if(linhaAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 
+                                else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
                                 
                                 <!--desenha a tabela de linhas da agenda-->
-                                <tr style="color:@trcolor">
+                                <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(linhaAgenda.IdAgenda))">
                                     <td>@linhaAgenda.HoraAgenda</td>
                                     <td>@linhaAgenda.NomeCandidato</td>
                                     <td>@linhaAgenda.Telefone</td>
@@ -135,6 +137,7 @@
     private string UserName = "Fernando Fitipaldi";
     public string mensagemAlerta = "Existem agendamentos marcados hoje para você!";
     public bool flagExibirMensagem = false;
+    public bool flagSairDaEdicao = false;
     public DateTime dataSelecionada;
     public string? trcolor;
 
@@ -150,7 +153,9 @@
     public ResumoAgendas[]? listResumoAgendas { get; set; } 
 
     //instancia um array da classe Agenda no objeto listAgendas
-    public Agenda[]? listAgendas { get; set; } 
+    public SiginUser.Models.Agenda[]? listAgendas { get; set; } 
+
+
 
     /// ---------------------------------------------------------
     /// <summary>
@@ -165,13 +170,15 @@
         authState = await _authState;
         if (authState.User.Identity.IsAuthenticated == false)
         {
-            navigation.NavigateTo("/Identity/Account/Login", true);
+            navigate.NavigateTo("/Identity/Account/Login", true);
         }
-
         //carrega as datas das agendas
         await GetDatasAgendas();
         VerificaAgendaParaHoje();
+        await GetResumoAgendasByCpfData(CpfProfisional, dataSelecionada.ToString("yyyy-MM-dd"), dataSelecionada.ToString("yyyy-MM-dd"));
     }
+
+
 
     /// --------------------------------------------------
     /// <summary>
@@ -183,7 +190,7 @@
     async Task GetDatasAgendas()
     {
         //ler do banco e carrega o objeto "listDtAgendas"
-        http.BaseAddress = new Uri("https://localhost:7037/");
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
         listDtAgendas = await http.GetFromJsonAsync<DataAgendas[]>($"api/servicos/GetDataAgendasByCpf/{CpfProfisional}");  
     }
 
@@ -196,13 +203,21 @@
     ///
     void VerificaAgendaParaHoje()
     {
+        DateTime dtCorrente = DateTime.Now.Date;
         foreach (var dtAgenda in listDtAgendas)
         {
-            if (dtAgenda.DataAgenda.Date == DateTime.Now.Date)
+            if (dtAgenda.DataAgenda.Date == dtCorrente)
             {
                 flagExibirMensagem = true;
                 mensagemAlerta = "Você tem agendamentos marcados para hoje!";
                 dataSelecionada = dtAgenda.DataAgenda;
+                break;
+            }
+            if (dtAgenda.DataAgenda.Date > dtCorrente)
+            {
+                flagExibirMensagem = false;
+                dataSelecionada = dtAgenda.DataAgenda;
+                break;
             }
         }
     }
@@ -255,7 +270,7 @@
     {
         //ler do banco e carrega o array de agendas
         if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
-        listAgendas = await http.GetFromJsonAsync<Agenda[]>($"api/agenda/GetAgendasByCpfData/{cpfProfissional}/{dtAgendaDe}/{dtAgendaAte}");  
+        listAgendas = await http.GetFromJsonAsync<SiginUser.Models.Agenda[]>($"api/agenda/GetAgendasByCpfData/{cpfProfissional}/{dtAgendaDe}/{dtAgendaAte}");  
     }
 
 
@@ -270,4 +285,9 @@
         flagExibirMensagem = false;
     }
 
+    private void EditarLinha(int agendaId)
+    {
+        flagSairDaEdicao = true;
+        navigate.NavigateTo($"/agenda/editar/{agendaId}");
+    }
 }

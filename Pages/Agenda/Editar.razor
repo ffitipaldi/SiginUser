@@ -1,0 +1,128 @@
+﻿@page "/agenda/editar/{agendaId:int}"
+@using SiginUser.Models
+@inject HttpClient  http
+@inject NavigationManager navigate
+@using SiginUser.Models.Consultas
+@using SiginUser.Pages.Dominio
+
+@if(agendaId == 0)
+{
+    <PageTitle>Nova Agenda</PageTitle>
+    <h2>Nova Agenda</h2>
+}
+else
+{
+    <PageTitle>Editar Agenda</PageTitle>
+    <h2>Editar Agenda</h2>
+}
+
+<!--formulário de edição para detalhamento, inclusão, alteração e exclusão -->
+@if (listStatusExames != null)
+{
+    <EditForm Model="@agenda" OnValidSubmit="@SalvarEdicaoAgenda">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label form="campo">Data da Agenda</label>
+            <div>
+                <InputDate @bind-Value="@agenda.DataAgenda" class="form-control" />
+                <ValidationMessage For="@(()=>agenda.DataAgenda)" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label form="campo">Hora da Agenda</label>
+            <div>
+                <InputText @bind-Value="@agenda.HoraAgenda" class="form-control" />
+                <ValidationMessage For="@(()=>agenda.HoraAgenda)" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label form="campo">Nome do Candidato</label>
+            <div>
+                <InputText @bind-Value="@agenda.NomeCandidato" class="form-control" />
+                <ValidationMessage For="@(()=>agenda.NomeCandidato)" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label form="sigla">Telefone</label>
+            <div>
+                <InputText @bind-Value="@agenda.Telefone" class="form-control" />
+                <ValidationMessage For="@(()=>agenda.Telefone)" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label form="descricao">Status Exame</label>
+            <div>
+                <InputSelect @bind-Value="agenda.StatusExPsico" class="form-control-sm">
+                @foreach (var stexame in listStatusExames)
+                {
+                    <option value="@stexame.Sigla">@stexame.Descricao</option>
+                }
+                </InputSelect>
+                <ValidationMessage For="@(()=>agenda.StatusExPsico)" />
+
+            </div>
+        </div>
+        <br/>
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <button class="btn btn-danger" @onclick="@ExcluirAgenda">Excluir</button>
+        <button class="btn btn-outline-dark" href="/">Retornar</button>
+    </EditForm>
+}
+@code {
+
+    [Parameter]
+    public int agendaId { get; set; }
+
+    //flag utilizada para sair da edição ao se utilizar o NavigateTO
+    private bool flagSairDaEdicao = false;
+
+    //instancia a classe Agenda no objeto agenda
+    Agenda agenda = new Agenda();
+
+    //instancia a classe StatusExames como objeto statusExames
+    public Dominio[]? listStatusExames { get; set; } 
+ 
+
+    protected async override Task OnParametersSetAsync()
+    {
+        //ler os dados do domínio a ser editado
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+
+        //carrega listbox com os status dos exames
+        listStatusExames = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominiosByCampo/StatusExame");
+
+        if( agendaId > 0)
+        {
+            agenda = await http.GetFromJsonAsync<Agenda>($"api/agenda/GetAgendaById/{agendaId}");
+        }
+    }
+
+    async Task SalvarEdicaoAgenda()
+    {
+        //salva o objeto dominio editado
+        if (flagSairDaEdicao == false)
+        {
+            if (agendaId == 0)
+            {
+                //inclui
+                await http.PostAsJsonAsync("api/agenda/AddAgenda", agenda);
+            }
+            else
+            {
+                //altera
+                await http.PutAsJsonAsync($"api/agenda/UpdateAgendaById/{agendaId}", agenda);
+            }
+        }
+        
+        //navega de volta para a página index
+        navigate.NavigateTo("/");            
+    }
+
+    async Task ExcluirAgenda()
+    {
+        //exclui
+        flagSairDaEdicao = true;
+        await http.DeleteAsync($"api/agenda/DeleteAgendaById/{agendaId}");
+    }
+}
