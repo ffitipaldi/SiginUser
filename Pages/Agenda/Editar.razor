@@ -23,35 +23,35 @@ else
         <DataAnnotationsValidator />
 
         <div class="form-group">
-            <label form="campo">Data da Agenda</label>
+            <label form="DataAgenda" style="color:gray">Data da Agenda</label>
             <div>
                 <InputDate @bind-Value="@agenda.DataAgenda" class="form-control" />
                 <ValidationMessage For="@(()=>agenda.DataAgenda)" />
             </div>
         </div>
         <div class="form-group">
-            <label form="campo">Hora da Agenda</label>
+            <label style="color:gray">Hora da Agenda</label>
             <div>
                 <InputText @bind-Value="@agenda.HoraAgenda" class="form-control" />
                 <ValidationMessage For="@(()=>agenda.HoraAgenda)" />
             </div>
         </div>
         <div class="form-group">
-            <label form="campo">Nome do Candidato</label>
+            <label style="color:gray">Nome do Candidato</label>
             <div>
-                <InputText @bind-Value="@agenda.NomeCandidato" class="form-control" />
+                <InputText @bind-Value="@agenda.NomeCandidato" class="form-control text-uppercase" />
                 <ValidationMessage For="@(()=>agenda.NomeCandidato)" />
             </div>
         </div>
         <div class="form-group">
-            <label form="sigla">Telefone</label>
+            <label style="color:gray">Telefone</label>
             <div>
                 <InputText @bind-Value="@agenda.Telefone" class="form-control" />
                 <ValidationMessage For="@(()=>agenda.Telefone)" />
             </div>
         </div>
         <div class="form-group">
-            <label form="descricao">Status Exame</label>
+            <label style="color:gray">Status Exame</label>
             <div>
                 <InputSelect @bind-Value="agenda.StatusExPsico" class="form-control-sm">
                 @foreach (var stexame in listStatusExames)
@@ -80,10 +80,19 @@ else
     //instancia a classe Agenda no objeto agenda
     Agenda agenda = new Agenda();
 
-    //instancia a classe StatusExames como objeto statusExames
-    public Dominio[]? listStatusExames { get; set; } 
- 
+    //instancia a classe StatusExames como objeto listStatusExames
+    public Dominio[]? listStatusExames { get; set; }
 
+    //data anterior a edição
+    public DateTime dataAgendaAntes;
+
+    /// -------------------------------------------------
+    /// <summary>
+    /// carrega os dados da agenda passados pelo IdAgenda
+    /// </summary>
+    /// <returns></returns>
+    /// --------------------------------------------------
+    /// 
     protected async override Task OnParametersSetAsync()
     {
         //ler os dados do domínio a ser editado
@@ -95,11 +104,25 @@ else
         if( agendaId > 0)
         {
             agenda = await http.GetFromJsonAsync<Agenda>($"api/agenda/GetAgendaById/{agendaId}");
+            dataAgendaAntes = agenda.DataAgenda;
         }
     }
 
+
+    /// --------------------------------------------
+    /// <summary>
+    /// salva os dados editados da agenda
+    /// </summary>
+    /// <returns></returns>
+    /// --------------------------------------------
+    /// 
     async Task SalvarEdicaoAgenda()
     {
+        string hora;
+        string minuto;
+        int tamanho;
+        int posdoispontos;
+
         //salva o objeto dominio editado
         if (flagSairDaEdicao == false)
         {
@@ -110,15 +133,71 @@ else
             }
             else
             {
+                //ajusta nome para caixa alta
+                agenda.NomeCandidato = agenda.NomeCandidato.ToUpper();
+
+                //ajusta hora para formato padrão hh:mm
+                posdoispontos = agenda.HoraAgenda.IndexOf(":");
+                tamanho = agenda.HoraAgenda.Length;                
+
+                if (posdoispontos == -1)
+                {
+                    if (tamanho == 1) {
+                        hora = "0" + agenda.HoraAgenda;
+                        minuto = "00";
+                        agenda.HoraAgenda = hora + ":" + minuto;
+                    } 
+                    else if (tamanho == 2) {
+                        hora = agenda.HoraAgenda;
+                        minuto = "00";
+                        agenda.HoraAgenda = hora + ":" + minuto;
+                    }
+                    else if(tamanho == 4)
+                    {
+                        hora = agenda.HoraAgenda.Substring(0,2);
+                        minuto = agenda.HoraAgenda.Substring(2,2);
+                        agenda.HoraAgenda = hora + ":" + minuto;
+                    }
+                }
+                else
+                {   if(posdoispontos == 1){
+                        hora = "0" + agenda.HoraAgenda.Substring(0,1);
+                        minuto = agenda.HoraAgenda.Substring(2, 2);
+                        agenda.HoraAgenda = hora + ":" + minuto;
+                    }   
+                    else if(posdoispontos == 2){
+                        hora = agenda.HoraAgenda.Substring(0,2);
+                        minuto = agenda.HoraAgenda.Substring(3, 2);
+                        agenda.HoraAgenda = hora + ":" + minuto;
+                    }
+                }
+
+                //altera a DataAgenda para conter a hora
+                agenda.DataAgenda = DateTime.Parse(agenda.DataAgenda.ToString("yyyy-MM-dd") + "T" + agenda.HoraAgenda + ":00");
+
+                //verifia se houve Reagendamento
+                if((agenda.StatusExPsico != "APTO" && agenda.StatusExPsico != "INAPTO") && dataAgendaAntes != agenda.DataAgenda)
+                {
+                    agenda.StatusExPsico = "REAGENDADO";
+                }
+
                 //altera
                 await http.PutAsJsonAsync($"api/agenda/UpdateAgendaById/{agendaId}", agenda);
             }
         }
-        
+
         //navega de volta para a página index
-        navigate.NavigateTo("/");            
+        navigate.NavigateTo("/", forceLoad: true);            
     }
 
+
+    /// ----------------------------------------------
+    /// <summary>
+    /// exclui a agenda mostrada na tela
+    /// </summary>
+    /// <returns></returns>
+    /// ----------------------------------------------
+    /// 
     async Task ExcluirAgenda()
     {
         //exclui

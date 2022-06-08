@@ -254,7 +254,7 @@ namespace SiginUser.Controllers
 
         ///-------------------------------------------------//
         /// <summary>
-        /// DELETE: api/agenda/DeleteAgendaById{id} - Deleta uma Agenda pelo Id
+        /// DELETE: api/agenda/DeleteAgendaById/{id} - Deleta uma Agenda pelo Id
         /// </summary>
         /// <param name="id">Identificador da Agenda que se deseja excluir</param>
         /// <returns>
@@ -278,7 +278,7 @@ namespace SiginUser.Controllers
         /// </returns>
         ///-------------------------------------------------//
         /// 
-        [HttpDelete("DeleteAgendaById{id}", Name = "DeleteAgendaById")]
+        [HttpDelete("DeleteAgendaById/{id}", Name = "DeleteAgendaById")]
         public async Task<ActionResult<Agenda>> Delete(int id)
         {
             var agenda = new Agenda { Id = id };
