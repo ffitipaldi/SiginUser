@@ -18,12 +18,12 @@ namespace SiginUser.Models
         public DateTime DataAgenda { get; set; }
 
         [MaxLength(5, ErrorMessage = "Campo limitado a 5 caracteres no máximo.")] 
-        public string HoraAgenda { get; set; }
+        public string? HoraAgenda { get; set; }
 
         public DateTime DataAgendaDetran { get; set; }
 
         [MaxLength(5, ErrorMessage = "Campo limitado a 5 caracteres no máximo.")]
-        public string HoraAgendaDetran { get; set; }
+        public string? HoraAgendaDetran { get; set; }
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(11, ErrorMessage = "Campo limitado a 11 caracteres no máximo.")]
@@ -34,25 +34,25 @@ namespace SiginUser.Models
         public string NomeCandidato { get; set; }
 
         [MaxLength(30, ErrorMessage = "Campo limitado a 30 caracteres no máximo.")]
-        public string Telefone { get; set; }
+        public string? Telefone { get; set; }
 
         [MaxLength(50, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]
-        public string EmailCandidato { get; set; }
+        public string? EmailCandidato { get; set; }
 
-        [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(10, ErrorMessage = "Campo limitado a 10 caracteres no máximo.")]
-        public string TipoProcesso { get; set; }
+        public string? TipoProcesso { get; set; }
 
-        [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(10, ErrorMessage = "Campo limitado a 10 caracteres no máximo.")]
-        public string Categoria { get; set; }
+        public string? Categoria { get; set; }
 
-        [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(10, ErrorMessage = "Campo limitado a 10 caracteres no máximo.")]
-        public string StatusExMedico { get; set; }
+        public string? StatusExMedico { get; set; }
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(10, ErrorMessage = "Campo limitado a 10 caracteres no máximo.")]
         public string StatusExPsico { get; set; }
+
+        [MaxLength(50, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]
+        public string? Observacao { get; set; }
     }
 }

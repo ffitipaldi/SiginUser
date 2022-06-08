@@ -101,7 +101,7 @@
                                 @foreach(var linhaAgenda in listResumoAgendas)
                                 {
                                     <!--determina a cor da linha de acordo com o status-->
-                                    @if(linhaAgenda.StatusExPsicoSigla == "APTO") trcolor = "lime"; 
+                                    @if(linhaAgenda.StatusExPsicoSigla == "APTO") trcolor = "forestgreen"; 
                                     else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
                                     else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
                                     else @if(linhaAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 

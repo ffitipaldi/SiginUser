@@ -75,7 +75,14 @@ else
             </div>
         </div>
         <div class="form-group">
-            <label form="DataAgenda" style="color:gray">Data Original Detran</label>
+            <label style="color:gray">Observação</label>
+            <div>
+                <InputText @bind-Value="@agenda.Observacao" class="form-control" />
+                <ValidationMessage For="@(()=>agenda.Observacao)" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label style="color:gray">Data Original Detran</label>
             <div>
                 <InputDate @bind-Value="@agenda.DataAgendaDetran" class="form-control" readonly="readonly" />
                 <ValidationMessage For="@(()=>agenda.DataAgendaDetran)" />
