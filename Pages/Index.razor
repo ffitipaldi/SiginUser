@@ -6,127 +6,132 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager navigate
 @inject HttpClient http
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
 
 
 <PageTitle>Via Rápida</PageTitle>
 
-@if(listDtAgendas != null)
+@if(flagSairDaEdicao != true)
 {
-    <div class="page">
+    @if(listDtAgendas != null)
+    {
+        <div class="page">
 
-        <!------------------------->
-        <!-- logotipo da Clínica -->
-        <!------------------------->
-        <table>
-            <tr>
-                <td><img src="/images/LogoMedio.png" width="80" /></td>
-                <td>
-                    <table>
-                        <tr><td><img src="/images/ViaRapida.png" width="180" /></td></tr>
-                        <tr><td><span><b>Clínica de Medicina e Psicologia do Trânsito</b></span></td></tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+            <!------------------------->
+            <!-- logotipo da Clínica -->
+            <!------------------------->
+            <table>
+                <tr>
+                    <td><img src="/images/LogoMedio.png" width="80" /></td>
+                    <td>
+                        <table>
+                            <tr><td><img src="/images/ViaRapida.png" width="180" /></td></tr>
+                            <tr><td><span><b>Clínica de Medicina e Psicologia do Trânsito</b></span></td></tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
 
-        <!-------------------------------------------->
-        <!-- Alerta de mensagens agendadas para hoje-->
-        <!-------------------------------------------->
-        <MensagemAlerta flagExibirMensagem=@flagExibirMensagem 
-                        mensagemAlerta=@mensagemAlerta />
+            <!-------------------------------------------->
+            <!-- Alerta de mensagens agendadas para hoje-->
+            <!-------------------------------------------->
+            <MensagemAlerta flagExibirMensagem=@flagExibirMensagem 
+                            mensagemAlerta=@mensagemAlerta />
 
-        <h3 class="mt-4">Agendamentos</h3>
+            <h3 class="mt-4">Agendamentos</h3>
 
-        <!------------------------------------------>
-        <!-- Monta Listbox com as datas agendadas -->    
-        <!------------------------------------------>
-        <div>
-            @if (listDtAgendas == null)
-            {
-                <span>Não existem agendas a serem mostradas.</span>
-            }
-            else
-            {
-                <span>Atendimentos agendados para </span>
-                <select class="form-control-sm" @onchange="@OnChangeDtAgenda" > <!--@bind="dataSelecionada-->
+            <!------------------------------------------>
+            <!-- Monta Listbox com as datas agendadas -->    
+            <!------------------------------------------>
+            <div>
+                @if (listDtAgendas == null)
+                {
+                    <span>Não existem agendas a serem mostradas.</span>
+                }
+                else
+                {
+                    <span>Atendimentos agendados para </span>
+                    <select class="form-control-sm" @onchange="@OnChangeDtAgenda" > <!--@bind="dataSelecionada-->
 
-                    //ler o array de datas com o "foreach" e monta um listbox(select)
-                    @foreach (var dtAgenda in listDtAgendas)
-                    {
-                        //seleciona automaticamente a data corrente ou maior
-                        @if (dtAgenda.DataAgenda.Date == dataSelecionada)
+                        //ler o array de datas com o "foreach" e monta um listbox(select)
+                        @foreach (var dtAgenda in listDtAgendas)
                         {
-                            <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")" selected>
-                                @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
-                            </option>
-                            //flagExibirMensagem = true;
-                            //mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
+                            //seleciona automaticamente a data corrente ou maior
+                            @if (dtAgenda.DataAgenda.Date == dataSelecionada)
+                            {
+                                <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")" selected>
+                                    @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                                </option>
+                                //flagExibirMensagem = true;
+                                //mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
 
+                            }
+                            else
+                            {
+                                //monta demais datas
+                                <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")">
+                                    @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
+                                </option>
+                            }
                         }
-                        else
-                        {
-                            //monta demais datas
-                            <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")">
-                                @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
-                            </option>
-                        }
-                    }
-                </select>
+                    </select>
+                }
+            </div>
+
+            <!------------------------------------------------------>
+            <!--lista os agendamentos marcados na data específica -->
+            <!------------------------------------------------------>
+            @if (listResumoAgendas != null)
+            {
+                <div class="row">
+
+                    <!-- Detalhe dos agendamentos - tabela a esquerda -->
+                    <div class="col-sm">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Hora</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Telefone</th>
+                                    <th scope="col">Obs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var linhaAgenda in listResumoAgendas)
+                                {
+                                    <!--determina a cor da linha de acordo com o status-->
+                                    @if(linhaAgenda.StatusExPsicoSigla == "APTO") trcolor = "lime"; 
+                                    else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
+                                    else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
+                                    else @if(linhaAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 
+                                    else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
+                                
+                                    <!--desenha a tabela de linhas da agenda-->
+                                    <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(linhaAgenda.IdAgenda))">
+                                        <td>@linhaAgenda.HoraAgenda</td>
+                                        <td>@linhaAgenda.NomeCandidato</td>
+                                        <td>@linhaAgenda.Telefone</td>
+                                        <td>@if(linhaAgenda.StatusExPsicoSigla == "APTO")
+                                                {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
+                                            else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO")
+                                                {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
+                                            else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR")
+                                                {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
+                                            else @if(linhaAgenda.StatusExPsicoSigla == "CANC")
+                                                {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
+                                            else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO")
+                                                {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
+                                        </td>
+                                     </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             }
         </div>
-
-        <!------------------------------------------------------>
-        <!--lista os agendamentos marcados na data específica -->
-        <!------------------------------------------------------>
-        @if (listResumoAgendas != null)
-        {
-            <div class="row">
-
-                <!-- Detalhe dos agendamentos - tabela a esquerda -->
-                <div class="col-sm">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Hora</th>
-                                <th scope="col">Cliente</th>
-                                <th scope="col">Telefone</th>
-                                <th scope="col">Obs</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach(var linhaAgenda in listResumoAgendas)
-                            {
-                                <!--determina a cor da linha de acordo com o status-->
-                                @if(linhaAgenda.StatusExPsicoSigla == "APTO") trcolor = "lime"; 
-                                else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
-                                else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
-                                else @if(linhaAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 
-                                else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
-                                
-                                <!--desenha a tabela de linhas da agenda-->
-                                <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(linhaAgenda.IdAgenda))">
-                                    <td>@linhaAgenda.HoraAgenda</td>
-                                    <td>@linhaAgenda.NomeCandidato</td>
-                                    <td>@linhaAgenda.Telefone</td>
-                                    <td>@if(linhaAgenda.StatusExPsicoSigla == "APTO")
-                                            {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
-                                        else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO")
-                                            {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
-                                        else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR")
-                                            {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
-                                        else @if(linhaAgenda.StatusExPsicoSigla == "CANC")
-                                            {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
-                                        else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO")
-                                            {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
-                                    </td>
-                                 </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        }
-    </div>
+    }
 }
 
 @code
@@ -140,6 +145,7 @@
     public bool flagSairDaEdicao = false;
     public DateTime dataSelecionada;
     public string? trcolor;
+    private string? sessionData; 
 
     [CascadingParameter]
     private Task
@@ -152,9 +158,45 @@
     //instancia um array do Resumo Agenda no objeto listResumoAgendas
     public ResumoAgendas[]? listResumoAgendas { get; set; } 
 
-    //instancia um array da classe Agenda no objeto listAgendas
+    //instancia um array da classe Agenda no objeto listAgendas - não usado
     public SiginUser.Models.Agenda[]? listAgendas { get; set; } 
 
+
+    /// ---------------------------------------------------------------
+    /// <summary>
+    /// Inicializa as variáveis de sessão
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    /// ---------------------------------------------------------------
+    /// 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            sessionData = (await ProtectedSessionStore.GetAsync<string>("sessionData")).Value ?? "";
+            await VerificaAgendaParaHoje();
+            await GetResumoAgendasByCpfData(CpfProfisional, dataSelecionada.ToString("yyyy-MM-dd"), dataSelecionada.ToString("yyyy-MM-dd"));
+            
+            // avisa ao sistema da renderizar a tela
+            StateHasChanged();
+        }
+    }
+
+
+    /// -----------------------------------------------------------------
+    /// <summary>
+    /// Salva a variavel de session
+    /// </summary>
+    /// <returns></returns>
+    /// -----------------------------------------------------------------
+    /// 
+    private async Task SaveDataSession() 
+    {
+        var tempdata = dataSelecionada.ToString("yyyy-MM-dd");
+        await ProtectedSessionStore.SetAsync("sessionData", tempdata);
+    }
 
 
     /// ---------------------------------------------------------
@@ -170,12 +212,10 @@
         authState = await _authState;
         if (authState.User.Identity.IsAuthenticated == false)
         {
-            navigate.NavigateTo("/Identity/Account/Login", true);
+            navigate.NavigateTo("/Identity/Account/Login", forceLoad: true);
         }
         //carrega as datas das agendas
         await GetDatasAgendas();
-        VerificaAgendaParaHoje();
-        await GetResumoAgendasByCpfData(CpfProfisional, dataSelecionada.ToString("yyyy-MM-dd"), dataSelecionada.ToString("yyyy-MM-dd"));
     }
 
 
@@ -197,28 +237,36 @@
 
     ///--------------------------------------------------------
     /// <summary>
-    /// verifica se tem agenda para hoje e marcar no listbox
+    /// verifica se tem agenda para hoje e marca no listbox
     /// </summary>
     ///--------------------------------------------------------
     ///
-    void VerificaAgendaParaHoje()
+    async Task VerificaAgendaParaHoje()
     {
-        DateTime dtCorrente = DateTime.Now.Date;
-        foreach (var dtAgenda in listDtAgendas)
+        if (sessionData != null && sessionData != "")
         {
-            if (dtAgenda.DataAgenda.Date == dtCorrente)
+            flagExibirMensagem = false;
+            dataSelecionada = DateTime.Parse(sessionData);
+        }
+        else
+        {
+            DateTime dtCorrente = DateTime.Now.Date;
+            foreach (var dtAgenda in listDtAgendas)
             {
-                flagExibirMensagem = true;
-                mensagemAlerta = "Você tem agendamentos marcados para hoje!";
-                dataSelecionada = dtAgenda.DataAgenda;
-                break;
-            }
-            if (dtAgenda.DataAgenda.Date > dtCorrente)
-            {
-                flagExibirMensagem = false;
-                dataSelecionada = dtAgenda.DataAgenda;
-                break;
-            }
+                if (dtAgenda.DataAgenda.Date == dtCorrente)
+                {
+                    flagExibirMensagem = true;
+                    mensagemAlerta = "Você tem agendamentos marcados para hoje!";
+                    dataSelecionada = dtAgenda.DataAgenda;
+                    break;
+                }
+                if (dtAgenda.DataAgenda.Date > dtCorrente)
+                {
+                    flagExibirMensagem = false;
+                    dataSelecionada = dtAgenda.DataAgenda;
+                    break;
+                }
+            }            
         }
     }
 
@@ -285,9 +333,10 @@
         flagExibirMensagem = false;
     }
 
-    private void EditarLinha(int agendaId)
+    private async Task EditarLinha(int agendaId)
     {
         flagSairDaEdicao = true;
-        navigate.NavigateTo($"/agenda/editar/{agendaId}");
+        await SaveDataSession();
+        navigate.NavigateTo($"/agenda/editar/{agendaId}", forceLoad: true, replace: true);
     }
 }
