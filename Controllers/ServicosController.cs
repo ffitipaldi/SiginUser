@@ -123,6 +123,94 @@ namespace SiginUser.Controllers
                 cmd.Dispose();
             }
             return resumoAgendas;
-        }       
+        }
+
+
+
+        [HttpGet("GetMesAgendasByCpf/{cpfprofissional}", Name = "GetMesAgendasByCpf")]
+        public async Task<ActionResult<List<DataAgendas>>> GetMesAgendasByCpf(string cpfprofissional)
+        {
+            List<DataAgendas> dataAgendas = new List<DataAgendas>();
+            using (SqlConnection con = new SqlConnection(_configuration.ConnectionString))
+            {
+                const string query =
+                    "Set Language PORTUGUESE; " +
+                    "Select CAST(substring(CONVERT(nvarchar(30), DataAgenda, 126),1,8) +'01' AS DATE) as DataConsulta " +
+                    "From Agendas " +
+                    "Where CpfProfissional = @CpfProfissional " +
+                    "Group by CAST(substring(CONVERT(nvarchar(30), DataAgenda, 126), 1, 8) + '01' AS DATE) " +
+                    "Order by DataConsulta ";
+
+                SqlCommand cmd = new SqlCommand(query, con)
+                {
+                    CommandType = CommandType.Text
+                };
+                cmd.Parameters.AddWithValue("@CpfProfissional", cpfprofissional);
+
+                con.Open();
+                SqlDataReader rdr = await cmd.ExecuteReaderAsync();
+
+                while (rdr.Read())
+                {
+                    DataAgendas dataagenda = new DataAgendas()
+                    {
+                        DataAgenda = (DateTime)rdr["DataConsulta"]
+                    };
+                    dataAgendas.Add(dataagenda);
+                }
+                cmd.Dispose();
+            }
+            return dataAgendas;
+        }
+
+        [HttpGet("GetResumoAgendasMesByCpfData/{cpfprofissional}/{datames}", Name = "GetResumoAgendasMesByCpfData")]
+        public async Task<ActionResult<List<ResumoAgendasMes>>> GetResumoAgendasMesByCpfData(string cpfprofissional, string datames)
+        {
+            List<ResumoAgendasMes> resumoAgendas = new List<ResumoAgendasMes>();
+            using (SqlConnection con = new SqlConnection(_configuration.ConnectionString))
+            {
+                const string query =
+                    "Select ag.Id, " +
+                    "		ag.DataAgenda, " +
+                    "		ag.HoraAgenda, " +
+                    "		ag.NomeCandidato, " + 
+                    "		ag.Telefone, " +
+                    "		dm.Descricao as TipoProcesso, " +
+                    "		ag.StatusExPsico " +
+                    "From Agendas as ag " +
+                    "Inner Join Dominios as dm ON dm.Campo = 'TipoProcesso' " +
+                    "Where ag.CpfProfissional = @CpfProfissional " +
+                    "  AND substring(CONVERT(nvarchar(30), ag.DataAgenda, 126),1,8) +'01' = @DataMes " +
+                    "  AND dm.Sigla = ag.TipoProcesso " +
+                    "Order by ag.DataAgenda";
+
+                SqlCommand cmd = new SqlCommand(query, con)
+                {
+                    CommandType = CommandType.Text
+                };
+                cmd.Parameters.AddWithValue("@CpfProfissional", cpfprofissional);
+                cmd.Parameters.AddWithValue("@DataMes", datames);
+
+                con.Open();
+                SqlDataReader rdr = await cmd.ExecuteReaderAsync();
+
+                while (rdr.Read())
+                {
+                    ResumoAgendasMes resumoagenda = new ResumoAgendasMes()
+                    {
+                        IdAgenda = (int)rdr["Id"],
+                        DataAgenda = (DateTime)rdr["DataAgenda"],
+                        HoraAgenda = (string)rdr["HoraAgenda"],
+                        NomeCandidato = (string)rdr["NomeCandidato"],
+                        Telefone = (string)rdr["Telefone"],
+                        TipoProcesso = (string)rdr["TipoProcesso"],
+                        StatusExPsicoSigla = (string)rdr["StatusExPsico"]
+                    };
+                    resumoAgendas.Add(resumoagenda);
+                }
+                cmd.Dispose();
+            }
+            return resumoAgendas;
+        }
     }
 }

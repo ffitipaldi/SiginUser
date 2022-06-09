@@ -1,0 +1,205 @@
+﻿@page "/relmensal"
+@using System.Globalization
+@using SiginUser.Models.Consultas
+@inject HttpClient http
+@inject NavigationManager navigate
+
+<h3>Relatorio Mensal</h3>
+
+
+@if(flagSairDaEdicao != true)
+{
+    @if(listDtAgendas != null)
+    {
+        <div class="page">
+
+            <!---------------------------------------------->
+            <!-- Monta Listbox com os meses das agendadas -->    
+            <!---------------------------------------------->
+            <div>
+                @if (listDtAgendas == null)
+                {
+                    <span>Não existem agendas a serem mostradas.</span>
+                }
+                else
+                {
+                    <span>Listar agendas referentes a </span>
+                    <select class="form-control-sm" @onchange="@OnChangeDtAgenda" >
+
+                        //ler o array de datas com o "foreach" e monta um listbox(select)
+                        <option value="" selected>Selecione uma data</option>
+                        @foreach (var dtAgenda in listDtAgendas)
+                        {
+                            <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")">
+                                @dtAgenda.DataAgenda.ToString("MMMM/yyyy",idioma)
+                            </option>
+                        }
+                    </select>
+                }
+            </div>
+
+            <!------------------------------------------------------>
+            <!--lista os agendamentos marcados na data específica -->
+            <!------------------------------------------------------>
+            @if (listResumoAgendas != null)
+            {
+                <div class="row">
+
+                    <!-- Detalhe dos agendamentos - tabela a esquerda -->
+                    <div class="col-sm">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Seq</th>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Hora</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Telefone</th>
+                                    <th scope="col">Processo</th>
+                                    <th scope="col">Obs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for(var i = 0; i < listResumoAgendas.Count();i++)
+                                {
+                                    <!--determina a cor da linha de acordo com o status-->
+                                    @if(listResumoAgendas[i].StatusExPsicoSigla == "APTO") trcolor = "forestgreen"; 
+                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
+                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
+                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "CANC") trcolor = "red"; 
+                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
+                                
+                                    <!--desenha a tabela de linhas da agenda-->
+                                    <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(listResumoAgendas[i].IdAgenda))">
+                                        <td>@(i+1)</td>
+                                        <td>@listResumoAgendas[i].DataAgenda.ToString("dd-MM-yyyy")</td>
+                                        <td>@listResumoAgendas[i].HoraAgenda</td>
+                                        <td>@listResumoAgendas[i].NomeCandidato</td>
+                                        <td>@listResumoAgendas[i].Telefone</td>
+                                        <td>@listResumoAgendas[i].TipoProcesso</td>
+                                        <td>@if(listResumoAgendas[i].StatusExPsicoSigla == "APTO")
+                                                {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
+                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "INAPTO")
+                                                {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
+                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "AREALIZAR")
+                                                {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
+                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "CANC")
+                                                {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
+                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "REAGENDADO")
+                                                {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
+                                        </td>
+                                     </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+@code
+{
+    CultureInfo idioma = new CultureInfo("pt-BR");
+    private string TipoPerfil = "Psicólogo";    
+    private string CpfProfisional = "19346827807";
+    private string UserName = "Fernando Fitipaldi";
+    public string mensagemAlerta = "Existem agendamentos marcados hoje para você!";
+    public bool flagExibirMensagem = false;
+    public bool flagSairDaEdicao = false;
+    public DateTime dataSelecionada;
+    public string? trcolor;
+    private string? sessionData;
+    public int numSequencia = 0;
+
+    [CascadingParameter]
+    private Task
+    <AuthenticationState> _authState { get; set; }
+    private AuthenticationState authState;
+
+    //instancia uma lista da classe "DataAgendas" no objeto "listDtAgendas"
+    public DataAgendas[]? listDtAgendas { get; set; }
+
+    //instancia um array do Resumo Agenda no objeto listResumoAgendas
+    public ResumoAgendasMes[]? listResumoAgendas { get; set; } 
+
+    /// ---------------------------------------------------------
+    /// <summary>
+    /// carrega o listbox com as datas das agendas
+    /// </summary>
+    /// <returns></returns>
+    /// ---------------------------------------------------------
+    /// 
+    protected override async Task OnInitializedAsync()
+    {
+        //estado de autenticação do usuário
+        authState = await _authState;
+        if (authState.User.Identity.IsAuthenticated == false)
+        {
+            navigate.NavigateTo("/Identity/Account/Login", forceLoad: true);
+        }
+        //carrega as datas das agendas
+        await GetMesAgendas();
+    }
+
+
+
+    /// --------------------------------------------------
+    /// <summary>
+    /// chama a API para carga dos meses das agendas
+    /// </summary>
+    /// <returns></returns>
+    /// --------------------------------------------------
+    /// 
+    async Task GetMesAgendas()
+    {
+        //ler do banco e carrega o objeto "listDtAgendas"
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+        listDtAgendas = await http.GetFromJsonAsync<DataAgendas[]>($"api/servicos/GetMesAgendasByCpf/{CpfProfisional}");  
+    }
+
+
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// Rotina de troca de datas no listbox
+    /// </summary>
+    /// <param name="changeEventArgs"></param>
+    /// <returns></returns>
+    ///--------------------------------------------------------
+    ///
+    async Task OnChangeDtAgenda(ChangeEventArgs changeEventArgs)
+    {
+        numSequencia = 0;
+        if (changeEventArgs.Value.ToString() != "")
+        {
+            dataSelecionada = Convert.ToDateTime(changeEventArgs.Value.ToString());
+            await GetResumoAgendasMesByCpfData(CpfProfisional, changeEventArgs.Value.ToString());
+        }
+    }
+
+
+    ///--------------------------------------------------------
+    /// <summary>
+    /// Carrega lista de resumos de agendas
+    /// </summary>
+    /// <param name="cpfProfissional"></param>
+    /// <param name="dtAgendaDe"></param>
+    /// <param name="dtAgendaAte"></param>
+    /// <returns></returns>
+    ///--------------------------------------------------------
+    ///
+    async Task GetResumoAgendasMesByCpfData(string cpfProfissional, string dtAgendaMes)
+    {
+        //ler do banco e carrega o array de resumo de agendas
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+        listResumoAgendas = await http.GetFromJsonAsync<ResumoAgendasMes[]>($"api/servicos/GetResumoAgendasMesByCpfData/{cpfProfissional}/{dtAgendaMes}");  
+    }
+
+    private async Task EditarLinha(int agendaId)
+    {
+        flagSairDaEdicao = true;
+        navigate.NavigateTo($"/agenda/editar/{agendaId}", forceLoad: true, replace: true);
+    }
+}
