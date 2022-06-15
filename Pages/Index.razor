@@ -3,11 +3,12 @@
 @using Microsoft.AspNetCore.Mvc
 @using SiginUser.Models.Consultas
 @using System.Globalization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager navigate
 @inject HttpClient http
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject ProtectedSessionStorage ProtectedSessionStore
+@inject IJSRuntime js
 
 
 <PageTitle>Via Rápida</PageTitle>
@@ -77,6 +78,10 @@
                         }
                     </select>
                 }
+                <!--Nova Agenda chama edição com Id=0 -->
+                <a class="btn btn-info float-end" @onclick="@(()=> EditarLinha(0))">
+                    Adiciona Agenda  
+                </a>
             </div>
 
             <!------------------------------------------------------>
@@ -212,7 +217,7 @@
         authState = await _authState;
         if (authState.User.Identity.IsAuthenticated == false)
         {
-            navigate.NavigateTo("/Identity/Account/Login", forceLoad: true);
+            await js.InvokeAsync<object>("jsFunctions.NavegarPara", "/Identity/Account/Login");
         }
         //carrega as datas das agendas
         await GetDatasAgendas();
@@ -337,6 +342,6 @@
     {
         flagSairDaEdicao = true;
         await SaveDataSession();
-        navigate.NavigateTo($"/agenda/editar/{agendaId}", forceLoad: true, replace: true);
-    }
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", $"agenda/editar/{agendaId}");
+        await js.InvokeAsync<object>("js.Alerta", "Dentro da Função Editar Agenda: ERRO - não navegou!");     }
 }

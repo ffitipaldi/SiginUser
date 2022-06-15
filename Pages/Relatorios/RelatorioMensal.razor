@@ -3,6 +3,7 @@
 @using SiginUser.Models.Consultas
 @inject HttpClient http
 @inject NavigationManager navigate
+@inject IJSRuntime js
 
 <h3>Relatorio Mensal</h3>
 
@@ -60,35 +61,35 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for(var i = 0; i < listResumoAgendas.Count();i++)
+                                @foreach (var linAgenda in listResumoAgendas)
                                 {
                                     <!--determina a cor da linha de acordo com o status-->
-                                    @if(listResumoAgendas[i].StatusExPsicoSigla == "APTO") trcolor = "forestgreen"; 
-                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
-                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
-                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "CANC") trcolor = "red"; 
-                                    else @if(listResumoAgendas[i].StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
+                                    @if(linAgenda.StatusExPsicoSigla == "APTO") trcolor = "forestgreen"; 
+                                    else @if(linAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
+                                    else @if(linAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
+                                    else @if(linAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 
+                                    else @if(linAgenda.StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
                                 
                                     <!--desenha a tabela de linhas da agenda-->
-                                    <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(listResumoAgendas[i].IdAgenda))">
-                                        <td>@(i+1)</td>
-                                        <td>@listResumoAgendas[i].DataAgenda.ToString("dd-MM-yyyy")</td>
-                                        <td>@listResumoAgendas[i].HoraAgenda</td>
-                                        <td>@listResumoAgendas[i].NomeCandidato</td>
-                                        <td>@listResumoAgendas[i].Telefone</td>
-                                        <td>@listResumoAgendas[i].TipoProcesso</td>
-                                        <td>@if(listResumoAgendas[i].StatusExPsicoSigla == "APTO")
+                                    <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(linAgenda.IdAgenda))">
+                                        <td>@(numSequencia++)</td>
+                                        <td>@linAgenda.DataAgenda.ToString("dd-MM-yyyy")</td>
+                                        <td>@linAgenda.HoraAgenda</td>
+                                        <td>@linAgenda.NomeCandidato</td>
+                                        <td>@linAgenda.Telefone</td>
+                                        <td>@linAgenda.TipoProcesso</td>
+                                        <td>@if(linAgenda.StatusExPsicoSigla == "APTO")
                                                 {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
-                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "INAPTO")
+                                            else @if(linAgenda.StatusExPsicoSigla == "INAPTO")
                                                 {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
-                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "AREALIZAR")
+                                            else @if(linAgenda.StatusExPsicoSigla == "AREALIZAR")
                                                 {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
-                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "CANC")
+                                            else @if(linAgenda.StatusExPsicoSigla == "CANC")
                                                 {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
-                                            else @if(listResumoAgendas[i].StatusExPsicoSigla == "REAGENDADO")
+                                            else @if(linAgenda.StatusExPsicoSigla == "REAGENDADO")
                                                 {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
                                         </td>
-                                     </tr>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -107,11 +108,11 @@
     private string UserName = "Fernando Fitipaldi";
     public string mensagemAlerta = "Existem agendamentos marcados hoje para você!";
     public bool flagExibirMensagem = false;
-    public bool flagSairDaEdicao = false;
+    public bool flagSairDaEdicao = false;   
     public DateTime dataSelecionada;
     public string? trcolor;
     private string? sessionData;
-    public int numSequencia = 0;
+    public int numSequencia = 1;
 
     [CascadingParameter]
     private Task
@@ -171,7 +172,7 @@
     ///
     async Task OnChangeDtAgenda(ChangeEventArgs changeEventArgs)
     {
-        numSequencia = 0;
+        numSequencia = 1;
         if (changeEventArgs.Value.ToString() != "")
         {
             dataSelecionada = Convert.ToDateTime(changeEventArgs.Value.ToString());
@@ -200,6 +201,6 @@
     private async Task EditarLinha(int agendaId)
     {
         flagSairDaEdicao = true;
-        navigate.NavigateTo($"/agenda/editar/{agendaId}", forceLoad: true, replace: true);
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", $"agenda/editar/{agendaId}");
     }
 }

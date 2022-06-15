@@ -4,42 +4,43 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link href="css/site.css" rel="stylesheet" />
-    <link href="SiginUser.styles.css" rel="stylesheet" />
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-</head>
-<body>
-    @RenderBody()
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <base href="~/" />
+        <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+        <link href="css/site.css" rel="stylesheet" />
+        <link href="SiginUser.styles.css" rel="stylesheet" />
+        <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    </head>
+    <body>
+        @RenderBody()
 
-    <div id="blazor-error-ui">
-        <environment include="Staging,Production">
-            An error has occurred. This application may no longer respond until reloaded.
-        </environment>
-        <environment include="Development">
-            An unhandled exception has occurred. See browser dev tools for details.
-        </environment>
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-
-    <footer class="footer border-top pl-3 text-muted" >        
-        <div class="container text-center">
-            &copy; 2022 - Via Rápida
-            @{
-                var foundPrivacy = Url.Page("/Privacy", new { area = "" });
-            }
-            @if (foundPrivacy != null)
-            {
-                <a asp-area="" asp-page="/Privacy">Privacy</a>
-            }
+        <div id="blazor-error-ui">
+            <environment include="Staging,Production">
+                An error has occurred. This application may no longer respond until reloaded.
+            </environment>
+            <environment include="Development">
+                An unhandled exception has occurred. See browser dev tools for details.
+            </environment>
+            <a href="" class="reload">Reload</a>
+            <a class="dismiss">🗙</a>
         </div>
-    </footer>
 
-    <script src="_framework/blazor.server.js"></script>
-</body>
+        <footer class="footer border-top pl-3 text-muted" >        
+            <div class="container text-center">
+                &copy; 2022 - Via Rápida
+                @{
+                    var foundPrivacy = Url.Page("/Privacy", new { area = "" });
+                }
+                @if (foundPrivacy != null)
+                {
+                    <a asp-area="" asp-page="/Privacy">Privacy</a>
+                }
+            </div>
+        </footer>
+
+        <script src="_framework/blazor.server.js"></script>
+        <script src="jsFunctions.js"> </script>
+    </body>
 </html>

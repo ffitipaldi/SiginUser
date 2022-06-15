@@ -1,8 +1,9 @@
 ﻿@page "/dominio/editar/{dominioId:int}"
 @using SiginUser.Models
+@using SiginUser.Pages.Dominio
 @inject HttpClient  http
 @inject NavigationManager navigation
-@using SiginUser.Pages.Dominio
+@inject IJSRuntime js
 
 @if(dominioId == 0)
 {
@@ -58,12 +59,8 @@ else
     [Parameter]
     public int dominioId { get; set; }
 
-    //flag utilizada para sair da edição ao se utilizar o NavigateTO
-    private bool flagSairDaEdicao = false;
-
-    //instancia a classe Dominio no objeto dominio
+    //instância a classe Dominio no objeto dominio
     Dominio dominio = new Dominio();    
-
 
     protected async override Task OnParametersSetAsync()
     {
@@ -78,29 +75,30 @@ else
 
     async Task SalvarEdicaoDominio()
     {
-        //salva o objeto dominio editado
-        if (flagSairDaEdicao == false)
+        if (dominioId == 0)
         {
-            if (dominioId == 0)
-            {
-                //inclui
-                await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
-            }
-            else
-            {
-                //altera
-                await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
-            }
+            //inclui novo dominio
+            await http.PostAsJsonAsync("api/dominio/AddDominio", dominio);
         }
-        
-        //navega de volta para a página index
-        navigation.NavigateTo("dominio");            
+        else
+        {
+            //altera dominio informado
+            await http.PutAsJsonAsync($"api/dominio/UpdateDominioById/{dominioId}", dominio);
+        }
+
+        //navega de volta para a página index do dominio
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "dominio");       
     }
 
     async Task ExcluirDominio()
     {
-        //exclui
-        flagSairDaEdicao = true;
-        await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
+        //exclui dominio informado
+        var resposta = await js.InvokeAsync<bool>("confirm","Confirma Exclusão do Domínio?");
+        if(resposta)
+        {
+            await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
+        }
+
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "dominio");
     }
 }

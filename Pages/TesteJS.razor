@@ -1,0 +1,15 @@
+﻿@page "/testejs"
+@inject IJSRuntime js
+
+<input type="text" @bind="message" />
+<button class="btn btn-primary" @onclick="Alert"> Alert Me!</button>
+
+@code {
+    public string? message;
+
+    private async Task Alert()
+    {
+        await js.InvokeAsync<object>("alert", message);
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", message);
+    }
+}

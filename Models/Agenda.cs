@@ -25,15 +25,14 @@ namespace SiginUser.Models
         [MaxLength(5, ErrorMessage = "Campo limitado a 5 caracteres no máximo.")]
         public string? HoraAgendaDetran { get; set; }
 
-        [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(11, ErrorMessage = "Campo limitado a 11 caracteres no máximo.")]
-        public string CpfCandidato { get; set; }
+        public string? CpfCandidato { get; set; }
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(50, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]
         public string NomeCandidato { get; set; }
 
-        [MaxLength(30, ErrorMessage = "Campo limitado a 30 caracteres no máximo.")]
+        [MaxLength(40, ErrorMessage = "Campo limitado a 40 caracteres no máximo.")]
         public string? Telefone { get; set; }
 
         [MaxLength(50, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]

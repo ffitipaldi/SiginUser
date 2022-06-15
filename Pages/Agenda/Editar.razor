@@ -1,14 +1,40 @@
 ﻿@page "/agenda/editar/{agendaId:int}"
 @using SiginUser.Models
-@inject HttpClient  http
-@inject NavigationManager navigate
 @using SiginUser.Models.Consultas
 @using SiginUser.Pages.Dominio
+@inject HttpClient  http
+@inject NavigationManager navigate
+@inject IJSRuntime js
+
 
 @if(agendaId == 0)
 {
     <PageTitle>Nova Agenda</PageTitle>
     <h2>Nova Agenda</h2>
+    
+    
+    //inicializa campos da agenda
+    agenda.TipoPerfil = "PSICO";
+    agenda.CpfProfissional = "19346827807";
+    if(agenda.DataAgenda == new DateTime(0001, 01, 01)) agenda.DataAgenda = DateTime.Now.Date;
+    agenda.StatusExMedico = "AREALIZ";
+    //agenda.DataAgendaDetran = agenda.DataAgenda;
+    //agenda.HoraAgendaDetran = agenda.HoraAgenda;
+
+    // abre linha para colar a agenda do Detran
+    <div>
+        <div class="form-group mb-2">
+            <input type="txt" @bind="@importagendatxt.CampoAgendaTxt" class="form-control" style="font-size: 14px;" placeholder="Cole a linha da agenda do Detran."/>
+        </div>
+        <div class="form-group mb-2 float-end">          
+            <button type="button" @onclick="FormFormataAgendaTxt" class="btn btn-outline-primary">
+                <span class="oi oi-account-login me-2" aria-hidden="true"/>
+                <span class="oi oi-align-left me-2" aria-hidden="true"/>
+            </button>
+        </div>
+    </div>
+    <br />    
+    <br />
 }
 else
 {
@@ -22,56 +48,96 @@ else
     <EditForm Model="@agenda" OnValidSubmit="@SalvarEdicaoAgenda">
         <DataAnnotationsValidator />
 
-        <div class="form-group">
-            <label form="DataAgenda" style="color:gray">Data da Agenda</label>
-            <div>
-                <InputDate @bind-Value="@agenda.DataAgenda" class="form-control" />
-                <ValidationMessage For="@(()=>agenda.DataAgenda)" />
+        <div class="row">
+            <div class="col form-group">
+                <label form="DataAgenda" style="color:gray">Data da Agenda</label>
+                <div>
+                    <InputDate @bind-Value="@agenda.DataAgenda" class="form-control" />
+                    <ValidationMessage For="@(()=>agenda.DataAgenda)" />
+                </div>
+            </div>
+            <div class="col form-group">
+                <label style="color:gray">Hora da Agenda</label>
+                <div>
+                    <InputText @bind-Value="@agenda.HoraAgenda" class="form-control" />
+                    <ValidationMessage For="@(()=>agenda.HoraAgenda)" />
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <label style="color:gray">Hora da Agenda</label>
-            <div>
-                <InputText @bind-Value="@agenda.HoraAgenda" class="form-control" />
-                <ValidationMessage For="@(()=>agenda.HoraAgenda)" />
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label style="color:gray">Nome do Candidato</label>
+                <div>
+                    <InputText @bind-Value="@agenda.NomeCandidato" class="form-control text-uppercase" />
+                    <ValidationMessage For="@(()=>agenda.NomeCandidato)" />
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label style="color:gray">E-mail</label>
+                <div>
+                    <InputText @bind-Value="@agenda.EmailCandidato" class="form-control" />
+                    <ValidationMessage For="@(()=>agenda.EmailCandidato)" />
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <label style="color:gray">Nome do Candidato</label>
-            <div>
-                <InputText @bind-Value="@agenda.NomeCandidato" class="form-control text-uppercase" />
-                <ValidationMessage For="@(()=>agenda.NomeCandidato)" />
+        <div class="row">
+            <div class="form-group col">
+                <label style="color:gray">Telefone</label>
+                <div>
+                    <InputText @bind-Value="@agenda.Telefone" class="form-control" />
+                    <ValidationMessage For="@(()=>agenda.Telefone)" />
+                </div>
+            </div>
+            <div class="form-group col">
+                <label style="color:gray">Cpf do Candidato</label>
+                <div>
+                    <InputText @bind-Value="@agenda.CpfCandidato" class="form-control" />
+                    <ValidationMessage For="@(()=>agenda.CpfCandidato)" />
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <label style="color:gray">Telefone</label>
-            <div>
-                <InputText @bind-Value="@agenda.Telefone" class="form-control" />
-                <ValidationMessage For="@(()=>agenda.Telefone)" />
+        <div class="row">
+            <div class="col form-group">
+                <label style="color:gray">Procedimento</label>
+                <div>
+                    <InputSelect @bind-Value="agenda.TipoProcesso" class="form-control-sm">
+                        <option value="">Escolha uma opção</option>
+                        @foreach (var tpprocesso in listTipoProcessos)
+                        {
+                            <option value="@tpprocesso.Sigla">@tpprocesso.Descricao</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(()=>agenda.TipoProcesso)" />
+                </div>
+            </div>
+            <div class="col form-group">
+                <label style="color:gray">Categoria</label>
+                <div>
+                    <InputText @bind-Value="@agenda.Categoria" class="form-control" />
+                    <ValidationMessage For="@(()=>agenda.Categoria)" />
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <label style="color:gray">Procedimento</label>
-            <div>
-                <InputSelect @bind-Value="agenda.TipoProcesso" class="form-control-sm">
-                @foreach (var tpprocesso in listTipoProcessos)
-                {
-                    <option value="@tpprocesso.Sigla">@tpprocesso.Descricao</option>
-                }
-                </InputSelect>
-                <ValidationMessage For="@(()=>agenda.TipoProcesso)" />
+        <div class="row">
+            <div class="form-group col">
+                <label style="color:gray">Status Exame</label>
+                <div>
+                    <InputSelect @bind-Value="agenda.StatusExPsico" class="form-control-sm">
+                        <option value="">Escola uma opção</option>
+                        @foreach (var stexame in listStatusExames)
+                        {
+                            <option value="@stexame.Sigla">@stexame.Descricao</option>
+                        }
+                        </InputSelect>
+                    <ValidationMessage For="@(()=>agenda.StatusExPsico)" />
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label style="color:gray">Status Exame</label>
-            <div>
-                <InputSelect @bind-Value="agenda.StatusExPsico" class="form-control-sm">
-                @foreach (var stexame in listStatusExames)
-                {
-                    <option value="@stexame.Sigla">@stexame.Descricao</option>
-                }
-                </InputSelect>
-                <ValidationMessage For="@(()=>agenda.StatusExPsico)" />
+            <div class="form-group col">
+                <label style="color:gray">Data Original Detran</label>
+                <div>
+                    <InputDate @bind-Value="@agenda.DataAgendaDetran" class="form-control" readonly="readonly" />
+                    <ValidationMessage For="@(()=>agenda.DataAgendaDetran)" />
+                </div>
             </div>
         </div>
         <div class="form-group">
@@ -79,13 +145,6 @@ else
             <div>
                 <InputText @bind-Value="@agenda.Observacao" class="form-control" />
                 <ValidationMessage For="@(()=>agenda.Observacao)" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label style="color:gray">Data Original Detran</label>
-            <div>
-                <InputDate @bind-Value="@agenda.DataAgendaDetran" class="form-control" readonly="readonly" />
-                <ValidationMessage For="@(()=>agenda.DataAgendaDetran)" />
             </div>
         </div>
         <br/>
@@ -96,8 +155,10 @@ else
 }
 @code {
 
-    [Parameter]
-    public int agendaId { get; set; }
+    [Parameter] public int agendaId { get; set; }               //parametro "agendaId"
+    ImportAgendaTxt importagendatxt = new ImportAgendaTxt();    //campo string da linha importada
+    private string[]? Campos;                                   //campos split da linha
+    private int i = 0;                                          //campo auxiliar
 
     //flag utilizada para sair da edição ao se utilizar o NavigateTO
     private bool flagSairDaEdicao = false;
@@ -154,71 +215,75 @@ else
         int tamanho;
         int posdoispontos;
 
-        //salva o objeto dominio editado
-        if (flagSairDaEdicao == false)
+        //ajusta nome para caixa alta
+        agenda.NomeCandidato = agenda.NomeCandidato.ToUpper();
+
+        //ajusta hora para formato padrão hh:mm
+        posdoispontos = agenda.HoraAgenda.IndexOf(":");
+        tamanho = agenda.HoraAgenda.Length;                
+
+        if (posdoispontos == -1)
         {
-            if (agendaId == 0)
-            {
-                //inclui
-                await http.PostAsJsonAsync("api/agenda/AddAgenda", agenda);
+            if (tamanho == 1) {
+                hora = "0" + agenda.HoraAgenda;
+                minuto = "00";
+                agenda.HoraAgenda = hora + ":" + minuto;
+            } 
+            else if (tamanho == 2) {
+                hora = agenda.HoraAgenda;
+                minuto = "00";
+                agenda.HoraAgenda = hora + ":" + minuto;
             }
-            else
+            else if(tamanho == 4)
             {
-                //ajusta nome para caixa alta
-                agenda.NomeCandidato = agenda.NomeCandidato.ToUpper();
-
-                //ajusta hora para formato padrão hh:mm
-                posdoispontos = agenda.HoraAgenda.IndexOf(":");
-                tamanho = agenda.HoraAgenda.Length;                
-
-                if (posdoispontos == -1)
-                {
-                    if (tamanho == 1) {
-                        hora = "0" + agenda.HoraAgenda;
-                        minuto = "00";
-                        agenda.HoraAgenda = hora + ":" + minuto;
-                    } 
-                    else if (tamanho == 2) {
-                        hora = agenda.HoraAgenda;
-                        minuto = "00";
-                        agenda.HoraAgenda = hora + ":" + minuto;
-                    }
-                    else if(tamanho == 4)
-                    {
-                        hora = agenda.HoraAgenda.Substring(0,2);
-                        minuto = agenda.HoraAgenda.Substring(2,2);
-                        agenda.HoraAgenda = hora + ":" + minuto;
-                    }
-                }
-                else
-                {   if(posdoispontos == 1){
-                        hora = "0" + agenda.HoraAgenda.Substring(0,1);
-                        minuto = agenda.HoraAgenda.Substring(2, 2);
-                        agenda.HoraAgenda = hora + ":" + minuto;
-                    }   
-                    else if(posdoispontos == 2){
-                        hora = agenda.HoraAgenda.Substring(0,2);
-                        minuto = agenda.HoraAgenda.Substring(3, 2);
-                        agenda.HoraAgenda = hora + ":" + minuto;
-                    }
-                }
-
-                //altera a DataAgenda para conter a hora
-                agenda.DataAgenda = DateTime.Parse(agenda.DataAgenda.ToString("yyyy-MM-dd") + "T" + agenda.HoraAgenda + ":00");
-
-                //verifia se houve Reagendamento
-                if((agenda.StatusExPsico != "APTO" && agenda.StatusExPsico != "INAPTO") && dataAgendaAntes != agenda.DataAgenda)
-                {
-                    agenda.StatusExPsico = "REAGENDADO";
-                }
-
-                //altera
-                await http.PutAsJsonAsync($"api/agenda/UpdateAgendaById/{agendaId}", agenda);
+                hora = agenda.HoraAgenda.Substring(0,2);
+                minuto = agenda.HoraAgenda.Substring(2,2);
+                agenda.HoraAgenda = hora + ":" + minuto;
+            }
+        }
+        else
+        {   if(posdoispontos == 1){
+                hora = "0" + agenda.HoraAgenda.Substring(0,1);
+                minuto = agenda.HoraAgenda.Substring(2, 2);
+                agenda.HoraAgenda = hora + ":" + minuto;
+            }   
+            else if(posdoispontos == 2){
+                hora = agenda.HoraAgenda.Substring(0,2);
+                minuto = agenda.HoraAgenda.Substring(3, 2);
+                agenda.HoraAgenda = hora + ":" + minuto;
             }
         }
 
+        //retira pontuação no cpf
+        agenda.CpfCandidato = agenda.CpfCandidato.Replace(".", "");
+        agenda.CpfCandidato = agenda.CpfCandidato.Replace("-", "");
+
+        if (agendaId == 0)
+        {
+            //inclui
+            agenda.StatusExMedico = "AREALIZ";
+            agenda.DataAgendaDetran = agenda.DataAgenda;
+            agenda.HoraAgendaDetran = agenda.HoraAgenda;
+
+            await http.PostAsJsonAsync("api/agenda/AddAgenda", agenda);
+        }
+        else
+        {
+            //altera a DataAgenda para conter a hora
+            agenda.DataAgenda = DateTime.Parse(agenda.DataAgenda.ToString("yyyy-MM-dd") + "T" + agenda.HoraAgenda + ":00");
+
+            //verifia se houve Reagendamento
+            if((agenda.StatusExPsico != "APTO" && agenda.StatusExPsico != "INAPTO") && dataAgendaAntes != agenda.DataAgenda)
+            {
+                agenda.StatusExPsico = "REAGENDADO";
+            }
+
+            //altera
+            await http.PutAsJsonAsync($"api/agenda/UpdateAgendaById/{agendaId}", agenda);
+        }
+
         //navega de volta para a página index
-        navigate.NavigateTo("/", forceLoad: true);            
+        await js.InvokeAsync<object>($"jsFunctions.NavegarPara", "/");
     }
 
 
@@ -232,11 +297,16 @@ else
     async Task ExcluirAgenda()
     {
         //exclui
-        flagSairDaEdicao = true;
-        await http.DeleteAsync($"api/agenda/DeleteAgendaById/{agendaId}");
+        var respExcluir = await js.InvokeAsync<bool>("confirm", "Confirma a exclusão?");
+        if (respExcluir)
+        {
+            await http.DeleteAsync($"api/agenda/DeleteAgendaById/{agendaId}");
+            await js.InvokeVoidAsync("alert", "Registro excluído com sucesso.");
+        }
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "/");
     }
 
-    
+
     /// ----------------------------------------------
     /// <summary>
     /// retorna a tela anterior
@@ -244,9 +314,37 @@ else
     /// <returns></returns>
     /// ----------------------------------------------
     /// 
-    void RetornaAgenda()
+    async Task RetornaAgenda()
     {
         //exclui
-        flagSairDaEdicao = true;
+        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "/");
+        await js.InvokeAsync<object>("js.Alerta", "Depois do Navigate");
+    }
+
+    async Task FormFormataAgendaTxt()
+    {
+        if(importagendatxt.CampoAgendaTxt.Length > 30)
+        {
+            //split da linha nos campos
+            Campos = importagendatxt.CampoAgendaTxt.Split("\t");
+
+            //formata campos
+            agenda.TipoPerfil = "PSICO";
+            agenda.CpfProfissional = "19346827807";
+            if(agenda.DataAgenda == new DateTime(0001, 01, 01)) agenda.DataAgenda = DateTime.Now.Date;
+            agenda.HoraAgenda = Campos[0];
+            agenda.DataAgendaDetran = agenda.DataAgenda;
+            agenda.HoraAgendaDetran = agenda.HoraAgenda;
+            agenda.CpfCandidato = Campos[1].Replace(".","");
+            agenda.CpfCandidato = agenda.CpfCandidato.Replace("-","");
+            agenda.NomeCandidato = Campos[2];
+            agenda.Telefone = Campos[3];
+            if(Campos[4] != "" && Campos[4] != "NÃO INFORMADO") agenda.EmailCandidato = Campos[4];
+            agenda.TipoProcesso = Campos[5];
+            agenda.Categoria = Campos[6];
+            agenda.StatusExMedico = "AREALIZ";
+            agenda.StatusExPsico = "AREALIZ";
+
+        }
     }
 }
