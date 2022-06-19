@@ -87,7 +87,7 @@ else
         }
 
         //navega de volta para a página index do dominio
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "dominio");       
+        await js.InvokeVoidAsync("NavegarPara", "dominio");       
     }
 
     async Task ExcluirDominio()
@@ -99,6 +99,6 @@ else
             await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
         }
 
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "dominio");
+        await js.InvokeVoidAsync("NavegarPara", "dominio");
     }
 }

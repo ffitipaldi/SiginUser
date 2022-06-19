@@ -113,6 +113,8 @@
     public string? trcolor;
     private string? sessionData;
     public int numSequencia = 1;
+    private string? dataAgendaLocalStorage;
+
 
     [CascadingParameter]
     private Task
@@ -201,6 +203,33 @@
     private async Task EditarLinha(int agendaId)
     {
         flagSairDaEdicao = true;
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", $"agenda/editar/{agendaId}");
+        await js.InvokeVoidAsync("SaveToSessionStorage","rotaretorno","/relmensal");
+        await js.InvokeVoidAsync("NavegarPara", $"agenda/editar/{agendaId}");
     }
+
+    /// ---------------------------------------------------------------
+    /// <summary>
+    /// Inicializa as variáveis do local store
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    /// ---------------------------------------------------------------
+    /// 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            //recupera data do local storage
+            dataAgendaLocalStorage = await js.InvokeAsync<string>("GetFromSessionStorage", "dataAgenda");
+            if (dataAgendaLocalStorage == null) dataAgendaLocalStorage = "";
+
+            //await VerificaAgendaParaHoje();
+            //await GetResumoAgendasByCpfData(CpfProfisional, dataSelecionada.ToString("yyyy-MM-dd"), dataSelecionada.ToString("yyyy-MM-dd"));
+
+            // avisa ao sistema para renderizar a tela
+            StateHasChanged();
+        }
+    }
+
 }

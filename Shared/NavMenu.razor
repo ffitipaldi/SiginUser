@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager navigate
+@inject IJSRuntime js
 
 @if (flagSairEdicao != true)
 {
@@ -81,7 +82,7 @@
     private async Task ClearDataSession() 
     {
         flagSairEdicao = true;
-        await ProtectedSessionStore.SetAsync("sessionData", "");
+        await js.InvokeVoidAsync("DestroyFromSessionStorage","dataAgenda");
         navigate.NavigateTo("/", forceLoad: true, replace: true);
     }
 }

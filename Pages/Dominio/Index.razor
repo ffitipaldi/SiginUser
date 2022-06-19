@@ -66,7 +66,7 @@ else
 
     public async Task EditarLinha(int dominioId)
     {
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", $"dominio/editar/{dominioId}");
+        await js.InvokeVoidAsync("NavegarPara", $"dominio/editar/{dominioId}");
         await js.InvokeVoidAsync("alert", "ERRO-Não navegou.");               
     }
 }

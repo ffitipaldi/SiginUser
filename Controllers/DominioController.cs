@@ -169,7 +169,7 @@ namespace SiginUser.Controllers
 
         ///-----------------------------------------------------------//
         /// <summary>
-        /// GET:api/dominio/GetDominioByCampoDesc/{descricao}  -  Ler um Dominio pelo Campo e Descrição 
+        /// GET:api/dominio/GetDominioByCampoDesc/{campo}/{descricao}  -  Ler um Dominio pelo Campo e Descrição 
         /// </summary>
         /// <param name="campo">Nome do campo desejado a ser listado</param>
         /// <param name="descricao">Descrição de um domínio</param>

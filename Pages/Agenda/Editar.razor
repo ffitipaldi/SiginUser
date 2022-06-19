@@ -24,7 +24,7 @@
     // abre linha para colar a agenda do Detran
     <div>
         <div class="form-group mb-2">
-            <input type="txt" @bind="@importagendatxt.CampoAgendaTxt" class="form-control" style="font-size: 14px;" placeholder="Cole a linha da agenda do Detran."/>
+            <input type="txt" @bind="@importagendatxt.CampoAgendaTxt" class="form-control" style="font-size: 14px;" placeholder="Cole aqui a linha da agenda do Detran."/>
         </div>
         <div class="form-group mb-2 float-end">          
             <button type="button" @onclick="FormFormataAgendaTxt" class="btn btn-outline-primary">
@@ -159,6 +159,7 @@ else
     ImportAgendaTxt importagendatxt = new ImportAgendaTxt();    //campo string da linha importada
     private string[]? Campos;                                   //campos split da linha
     private int i = 0;                                          //campo auxiliar
+    private string? rotaRetorno;                                        //campo salvo para retorno
 
     //flag utilizada para sair da edição ao se utilizar o NavigateTO
     private bool flagSairDaEdicao = false;
@@ -283,7 +284,7 @@ else
         }
 
         //navega de volta para a página index
-        await js.InvokeAsync<object>($"jsFunctions.NavegarPara", "/");
+        await RetornaAgenda();   
     }
 
 
@@ -303,7 +304,7 @@ else
             await http.DeleteAsync($"api/agenda/DeleteAgendaById/{agendaId}");
             await js.InvokeVoidAsync("alert", "Registro excluído com sucesso.");
         }
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "/");
+        await RetornaAgenda();   
     }
 
 
@@ -316,13 +317,18 @@ else
     /// 
     async Task RetornaAgenda()
     {
-        //exclui
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", "/");
-        await js.InvokeAsync<object>("js.Alerta", "Depois do Navigate");
+        rotaRetorno = await js.InvokeAsync<string>("GetFromSessionStorage", "rotaretorno");
+        if (rotaRetorno != null)
+        {
+            await js.InvokeVoidAsync("DestroyFromSessionStorage","rotaretorno");
+            await js.InvokeVoidAsync("NavegarPara", rotaRetorno);    
+        }
     }
 
     async Task FormFormataAgendaTxt()
     {
+        Dominio dominio = new Dominio();
+
         if(importagendatxt.CampoAgendaTxt.Length > 30)
         {
             //split da linha nos campos
@@ -340,10 +346,11 @@ else
             agenda.NomeCandidato = Campos[2];
             agenda.Telefone = Campos[3];
             if(Campos[4] != "" && Campos[4] != "NÃO INFORMADO") agenda.EmailCandidato = Campos[4];
-            agenda.TipoProcesso = Campos[5];
+            dominio = await http.GetFromJsonAsync<Dominio>($"api/dominio/GetDominioByCampoDesc/TipoProcesso/{Campos[5]}");
+            agenda.TipoProcesso = dominio.Sigla;
             agenda.Categoria = Campos[6];
-            agenda.StatusExMedico = "AREALIZ";
-            agenda.StatusExPsico = "AREALIZ";
+            agenda.StatusExMedico = "AREALIZAR";
+            agenda.StatusExPsico = "AREALIZAR";
 
         }
     }

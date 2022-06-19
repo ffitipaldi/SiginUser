@@ -3,11 +3,9 @@
 @using Microsoft.AspNetCore.Mvc
 @using SiginUser.Models.Consultas
 @using System.Globalization
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager navigate
 @inject HttpClient http
-@inject ProtectedSessionStorage ProtectedSessionStore
 @inject IJSRuntime js
 
 
@@ -52,8 +50,8 @@
                 }
                 else
                 {
-                    <span>Atendimentos agendados para </span>
-                    <select class="form-control-sm" @onchange="@OnChangeDtAgenda" > <!--@bind="dataSelecionada-->
+                    <span>Atendimentos para </span>
+                    <select class="form-control-sm" @onchange="@OnChangeDtAgenda" > 
 
                         //ler o array de datas com o "foreach" e monta um listbox(select)
                         @foreach (var dtAgenda in listDtAgendas)
@@ -64,9 +62,6 @@
                                 <option value="@dtAgenda.DataAgenda.ToString("yyyy-MM-dd")" selected>
                                     @dtAgenda.DataAgenda.ToString("dddd - dd/MM/yyyy",idioma)
                                 </option>
-                                //flagExibirMensagem = true;
-                                //mensagemAlerta = "Atenção! Você tem agendamentos marcados para hoje!";
-
                             }
                             else
                             {
@@ -78,9 +73,22 @@
                         }
                     </select>
                 }
-                <!--Nova Agenda chama edição com Id=0 -->
+
+                <!------------------------------------------------------>
+                <!--Botões de navegação no checkbox de agendas        -->
+                <!------------------------------------------------------>
+                <a class="btn btn-lg" @onclick="@(()=> MudarLinha(-1))">
+                    <span class="oi oi-arrow-circle-left" aria-hidden="true"></span>
+                </a>
+                <a class="btn btn-lg" @onclick="@(()=> MudarLinha(1))">
+                    <span class="oi oi-arrow-circle-right" aria-hidden="true"></span>
+                </a>
+
+                <!------------------------------------------------------>
+                <!--Nova Agenda chama edição com Id=0                 -->
+                <!------------------------------------------------------>
                 <a class="btn btn-info float-end" @onclick="@(()=> EditarLinha(0))">
-                    Adiciona Agenda  
+                    <span class="oi oi-plus" aria-hidden="true"></span> 
                 </a>
             </div>
 
@@ -150,7 +158,7 @@
     public bool flagSairDaEdicao = false;
     public DateTime dataSelecionada;
     public string? trcolor;
-    private string? sessionData; 
+    private string? dataAgendaSessionStorage;
 
     [CascadingParameter]
     private Task
@@ -169,7 +177,7 @@
 
     /// ---------------------------------------------------------------
     /// <summary>
-    /// Inicializa as variáveis de sessão
+    /// Inicializa as variáveis do session store
     /// </summary>
     /// <param name="firstRender"></param>
     /// <returns></returns>
@@ -180,11 +188,14 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            sessionData = (await ProtectedSessionStore.GetAsync<string>("sessionData")).Value ?? "";
+            //recupera data do session storage
+            dataAgendaSessionStorage = await js.InvokeAsync<string>("GetFromSessionStorage", "dataSelecionadaToList");
+            if (dataAgendaSessionStorage == null) dataAgendaSessionStorage = "";
+
             await VerificaAgendaParaHoje();
             await GetResumoAgendasByCpfData(CpfProfisional, dataSelecionada.ToString("yyyy-MM-dd"), dataSelecionada.ToString("yyyy-MM-dd"));
-            
-            // avisa ao sistema da renderizar a tela
+
+            // avisa ao sistema para renderizar a tela
             StateHasChanged();
         }
     }
@@ -192,15 +203,15 @@
 
     /// -----------------------------------------------------------------
     /// <summary>
-    /// Salva a variavel de session
+    /// Salva a variavel no session store 
     /// </summary>
     /// <returns></returns>
     /// -----------------------------------------------------------------
     /// 
-    private async Task SaveDataSession() 
+    private async Task SaveSessionData() 
     {
         var tempdata = dataSelecionada.ToString("yyyy-MM-dd");
-        await ProtectedSessionStore.SetAsync("sessionData", tempdata);
+        await js.InvokeVoidAsync("SaveToSessionStorage","dataSelecionadaToList", tempdata);
     }
 
 
@@ -217,7 +228,7 @@
         authState = await _authState;
         if (authState.User.Identity.IsAuthenticated == false)
         {
-            await js.InvokeAsync<object>("jsFunctions.NavegarPara", "/Identity/Account/Login");
+            await js.InvokeVoidAsync("NavegarPara", "/Identity/Account/Login");
         }
         //carrega as datas das agendas
         await GetDatasAgendas();
@@ -248,10 +259,10 @@
     ///
     async Task VerificaAgendaParaHoje()
     {
-        if (sessionData != null && sessionData != "")
+        if (dataAgendaSessionStorage != null && dataAgendaSessionStorage != "")
         {
             flagExibirMensagem = false;
-            dataSelecionada = DateTime.Parse(sessionData);
+            dataSelecionada = DateTime.Parse(dataAgendaSessionStorage);
         }
         else
         {
@@ -338,10 +349,22 @@
         flagExibirMensagem = false;
     }
 
+
+    /// <summary>
+    /// Editar linha da agenda
+    /// </summary>
+    /// <param name="agendaId"></param>
+    /// <returns></returns>
     private async Task EditarLinha(int agendaId)
     {
         flagSairDaEdicao = true;
-        await SaveDataSession();
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", $"agenda/editar/{agendaId}");
-        await js.InvokeAsync<object>("js.Alerta", "Dentro da Função Editar Agenda: ERRO - não navegou!");     }
+        await SaveSessionData();
+        await js.InvokeVoidAsync("SaveToSessionStorage","rotaretorno","/");
+        await js.InvokeVoidAsync("NavegarPara", $"agenda/editar/{agendaId}");
+    }
+
+    private async void MudarLinha(int incremento)
+    {
+        await js.InvokeVoidAsync("alert", "recebido parametro " + incremento.ToString());
+    }
 }

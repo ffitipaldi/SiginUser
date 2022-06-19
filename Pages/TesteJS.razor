@@ -1,15 +1,17 @@
 ﻿@page "/testejs"
 @inject IJSRuntime js
 
-<input type="text" @bind="message" />
-<button class="btn btn-primary" @onclick="Alert"> Alert Me!</button>
+<label>Rota:</label>
+<input type="text" @bind="rota" />
+<button class="btn btn-primary" @onclick="Alerta"> Navegar </button>
 
 @code {
-    public string? message;
+    public string? rota;
 
-    private async Task Alert()
+    private async Task Alerta()
     {
-        await js.InvokeAsync<object>("alert", message);
-        await js.InvokeAsync<object>("jsFunctions.NavegarPara", message);
+        await js.InvokeVoidAsync("SaveToSessionStorage","rotaretorno","/testejs");
+        await js.InvokeVoidAsync("NavegarPara", rota);
+        await js.InvokeVoidAsync("alert", "###ERRO - Não navegou de imediato - ERRO### ");
     }
 }
