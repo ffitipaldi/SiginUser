@@ -43,7 +43,8 @@ namespace SiginUser.Controllers
         ///         "tipoProcesso": "PRIHAB",
         ///         "categoria": "AB",
         ///         "statusExMedico": "NAOREALIZD",
-        ///         "statusExPsico": "NAOREALIZD"
+        ///         "statusExPsico": "NAOREALIZD",
+        ///         "flagCandidatoCompareceu": True
         ///       }
         ///     ]
         /// </returns>
@@ -52,14 +53,20 @@ namespace SiginUser.Controllers
         [HttpGet("GetAgendas", Name = "GetAgendas")]
         public async Task<ActionResult<List<Agenda>>> GetAgendas()
         {
-            return await context.Agendas.AsNoTracking()
-                .OrderByDescending(x => x.DataAgenda)  
-                .ToListAsync();
+                return await context.Agendas.AsNoTracking()
+                    .OrderByDescending(x => x.DataAgenda)
+                    .ToListAsync();
 
-            //return await context.Agendas.AsNoTracking()
-            //    .OrderBy(x => x.CpfProfissional)
-            //    .ThenBy(x => x.DataAgenda)
-            //    .ToListAsync();
+                //retornar um container vazio
+                //var agendas = new List<Agenda>();
+                //return Ok(agendas);
+
+
+                //return await context.Agendas.AsNoTracking()
+                //    .OrderBy(x => x.CpfProfissional)
+                //    .ThenBy(x => x.DataAgenda)
+                //    .ToListAsync();
+               
         }
 
 
@@ -88,7 +95,8 @@ namespace SiginUser.Controllers
         ///         "tipoProcesso": "PRIHAB",
         ///         "categoria": "AB",
         ///         "statusExMedico": "NAOREALIZD",
-        ///         "statusExPsico": "NAOREALIZD"
+        ///         "statusExPsico": "NAOREALIZD",
+        ///         "flagCandidatoCompareceu": True
         ///       }
         ///     ]
         /// </returns>
@@ -129,7 +137,8 @@ namespace SiginUser.Controllers
         ///         "tipoProcesso": "PRIHAB",
         ///         "categoria": "AB",
         ///         "statusExMedico": "NAOREALIZD",
-        ///         "statusExPsico": "NAOREALIZD"
+        ///         "statusExPsico": "NAOREALIZD",
+        ///         "flagCandidatoCompareceu": True
         ///       }
         /// </returns>
         ///-------------------------------------------------------------//
@@ -164,7 +173,8 @@ namespace SiginUser.Controllers
         ///       "tipoProcesso": "RENOV",
         ///       "categoria": "AB",
         ///       "statusExMedico": "NAOREALIZD",
-        ///       "statusExPsico": "NAOREALIZD"
+        ///       "statusExPsico": "NAOREALIZD",
+        ///       "flagCandidatoCompareceu": True
         ///     }
         /// </param>
         /// <returns>
@@ -183,7 +193,8 @@ namespace SiginUser.Controllers
         ///       "tipoProcesso": "RENOV",
         ///       "categoria": "AB",
         ///       "statusExMedico": "NAOREALIZD",
-        ///       "statusExPsico": "NAOREALIZD"
+        ///       "statusExPsico": "NAOREALIZD",
+        ///       "flagCandidatoCompareceu": True
         ///     }
         /// </returns>
         ///-------------------------------------------------//
@@ -217,7 +228,8 @@ namespace SiginUser.Controllers
         ///       "tipoProcesso": "RENOV",
         ///       "categoria": "C",
         ///       "statusExMedico": "NAOREALIZD",
-        ///       "statusExPsico": "NAOREALIZD"
+        ///       "statusExPsico": "NAOREALIZD",
+        ///       "flagCandidatoCompareceu": True
         ///     }
         /// </param>
         /// <param name="agenda"></param>
@@ -237,7 +249,8 @@ namespace SiginUser.Controllers
         ///       "tipoProcesso": "RENOV",
         ///       "categoria": "C",
         ///       "statusExMedico": "NAOREALIZD",
-        ///       "statusExPsico": "NAOREALIZD"
+        ///       "statusExPsico": "NAOREALIZD",
+        ///       "flagCandidatoCompareceu": True
         ///     }
         /// </returns>
         ///-------------------------------------------------------------------------------//
@@ -273,7 +286,8 @@ namespace SiginUser.Controllers
         ///        "tipoProcesso": null,
         ///        "categoria": null,
         ///        "statusExMedico": null,
-        ///        "statusExPsico": null
+        ///        "statusExPsico": null,
+        ///        "flagCandidatoCompareceu": false
         ///      }
         /// </returns>
         ///-------------------------------------------------//

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using SiginUser.Data;
+using SiginUser.Models;
 using SiginUser.Models.Consultas;
+using SiginUser.Models.Updates;
 using System.Data;
 
 namespace SiginUser.Controllers
@@ -72,14 +74,16 @@ namespace SiginUser.Controllers
             return dataAgendas;
         }
 
-
+        /// ------------------------------------------------------------
         /// <summary>
-        /// Retorna um array de resumo de agendas
+        /// Retorna um array de resumo de agendas filtrado por CPF/Data
         /// </summary>
         /// <param name="cpfprofissional"></param>
         /// <param name="datade"></param>
         /// <param name="dataate"></param>
         /// <returns></returns>
+        /// ------------------------------------------------------------
+        /// 
         [HttpGet("GetResumoAgendasByCpfData/{cpfprofissional}/{datade}/{dataate}", Name = "GetResumoAgendasByCpfData")]
         public async Task<ActionResult<List<ResumoAgendas>>> GetResumoAgendasByCpfData(string cpfprofissional, string datade, string dataate)
         {
@@ -91,7 +95,8 @@ namespace SiginUser.Controllers
 		            "        HoraAgenda, " +
 		            "        NomeCandidato, " +
 		            "        Telefone, " +
-		            "        StatusExPsico " +
+		            "        StatusExPsico, " +
+                    "        FlagCandidatoCompareceu " +
                     "From Agendas " +
                     "Where CpfProfissional = @CpfProfissional " +
                     "    AND CAST(DataAgenda AS DATE) BETWEEN CAST(@DataDE as DATE) AND CAST(@DataATE as DATE) " +
@@ -116,7 +121,8 @@ namespace SiginUser.Controllers
                         HoraAgenda = (string)rdr["HoraAgenda"],
                         NomeCandidato = (string)rdr["NomeCandidato"],
                         Telefone = (string)rdr["Telefone"],
-                        StatusExPsicoSigla = (string)rdr["StatusExPsico"]
+                        StatusExPsicoSigla = (string)rdr["StatusExPsico"],
+                        FlagCandidatoCompareceu = (bool)rdr["FlagCandidatoCompareceu"]
                     };
                     resumoAgendas.Add(resumoagenda);
                 }
@@ -125,8 +131,14 @@ namespace SiginUser.Controllers
             return resumoAgendas;
         }
 
-
-
+        /// -----------------------------------------------------------------------------
+        /// <summary>
+        /// Retorna um array de resumo de agendas filtrado po CPF
+        /// </summary>
+        /// <param name="cpfprofissional"></param>
+        /// <returns></returns>
+        /// -----------------------------------------------------------------------------
+        /// 
         [HttpGet("GetMesAgendasByCpf/{cpfprofissional}", Name = "GetMesAgendasByCpf")]
         public async Task<ActionResult<List<DataAgendas>>> GetMesAgendasByCpf(string cpfprofissional)
         {
@@ -163,6 +175,16 @@ namespace SiginUser.Controllers
             return dataAgendas;
         }
 
+
+        /// ---------------------------------------------------------------------------------
+        /// <summary>
+        /// Retorna um array de resumo de agendas filtrado por Cpf e Data consolidado no mes
+        /// </summary>
+        /// <param name="cpfprofissional"></param>
+        /// <param name="datames"></param>
+        /// <returns></returns>
+        /// ---------------------------------------------------------------------------------
+        /// 
         [HttpGet("GetResumoAgendasMesByCpfData/{cpfprofissional}/{datames}", Name = "GetResumoAgendasMesByCpfData")]
         public async Task<ActionResult<List<ResumoAgendasMes>>> GetResumoAgendasMesByCpfData(string cpfprofissional, string datames)
         {
@@ -212,5 +234,36 @@ namespace SiginUser.Controllers
             }
             return resumoAgendas;
         }
+
+
+        [HttpPut("UpdateFlagCompareceuById/{id}", Name = "UpdateFlagCompareceuById")]
+        public async Task<ActionResult<UpdateFlagCompareceu>> Put(int id, UpdateFlagCompareceu oFlg)
+        {
+            using (SqlConnection con = new SqlConnection(_configuration.ConnectionString))
+            {
+                var recordsAffected = 0;
+                const string query =
+                    "Update Agendas " +
+                    "Set FlagCandidatoCompareceu = @flg " +
+                    "where Id = @id ";
+
+                SqlCommand cmd = new SqlCommand(query, con)
+                {
+                    CommandType = CommandType.Text
+                };
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@flg", oFlg.FlagCandidatoComprareceu);
+
+                con.Open();
+
+                SqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                recordsAffected = (int)rdr.RecordsAffected;
+
+                cmd.Dispose();
+
+                return Ok(recordsAffected);
+            }
+        }
+
     }
 }

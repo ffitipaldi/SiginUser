@@ -3,6 +3,8 @@
 @using Microsoft.AspNetCore.Mvc
 @using SiginUser.Models.Consultas
 @using System.Globalization
+@using System.Net.Http.Json
+@using SiginUser.Models.Updates
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager navigate
 @inject HttpClient http
@@ -10,14 +12,17 @@
 
 
 <PageTitle>Via Rápida</PageTitle>
+<!-- -------------  trace   --------------------------- -->
+@if (flagMostraTrace) { Console.WriteLine(@traceMessage); }
+<!-------------------------------------------------------->
 
 @if(flagSairDaEdicao != true)
 {
     @if(listDtAgendas != null)
     {
         <div class="page">
-
-            <!------------------------->
+            
+@*            <!------------------------->
             <!-- logotipo da Clínica -->
             <!------------------------->
             <table>
@@ -30,7 +35,7 @@
                         </table>
                     </td>
                 </tr>
-            </table>
+            </table>*@
 
             <!-------------------------------------------->
             <!-- Alerta de mensagens agendadas para hoje-->
@@ -77,12 +82,12 @@
                 <!------------------------------------------------------>
                 <!--Botões de navegação no checkbox de agendas        -->
                 <!------------------------------------------------------>
-                <a class="btn btn-lg" @onclick="@(()=> MudarLinha(-1))">
+                @*<a class="btn btn-lg" @onclick="@(()=> MudarLinha(-1))">
                     <span class="oi oi-arrow-circle-left" aria-hidden="true"></span>
                 </a>
                 <a class="btn btn-lg" @onclick="@(()=> MudarLinha(1))">
                     <span class="oi oi-arrow-circle-right" aria-hidden="true"></span>
-                </a>
+                </a>*@
 
                 <!------------------------------------------------------>
                 <!--Nova Agenda chama edição com Id=0                 -->
@@ -99,11 +104,12 @@
             {
                 <div class="row">
 
-                    <!-- Detalhe dos agendamentos - tabela a esquerda -->
+                    <!-- Detalhe dos agendamentos  -->
                     <div class="col-sm">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th scope="col"></th>
                                     <th scope="col">Hora</th>
                                     <th scope="col">Cliente</th>
                                     <th scope="col">Telefone</th>
@@ -114,24 +120,43 @@
                                 @foreach(var linhaAgenda in listResumoAgendas)
                                 {
                                     <!--determina a cor da linha de acordo com o status-->
-                                    @if(linhaAgenda.StatusExPsicoSigla == "APTO") trcolor = "forestgreen"; 
-                                    else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
+                                    @if(linhaAgenda.StatusExPsicoSigla == "REALIZADO") trcolor = "forestgreen"; 
+                                    else @if(linhaAgenda.StatusExPsicoSigla == "RETESTE") trcolor = "cadetblue"; 
                                     else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
-                                    else @if(linhaAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 
+                                    else @if(linhaAgenda.StatusExPsicoSigla == "CANCELADO") trcolor = "red"; 
                                     else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
-                                
+
                                     <!--desenha a tabela de linhas da agenda-->
                                     <tr style="color:@trcolor" @onclick="@(()=> EditarLinha(linhaAgenda.IdAgenda))">
+                                        <td>
+                                            @if (linhaAgenda.FlagCandidatoCompareceu)
+                                            {
+                                                <input  class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value=@linhaAgenda.FlagCandidatoCompareceu 
+                                                        @onclick="@(()=> MarcarCompareceu(linhaAgenda.IdAgenda, linhaAgenda.FlagCandidatoCompareceu))"
+                                                        checked
+                                                        />
+                                            }
+                                            else
+                                            {
+                                                <input  class="form-check-input" 
+                                                        type="checkbox" 
+                                                        value=@linhaAgenda.FlagCandidatoCompareceu 
+                                                        @onclick="@(()=> MarcarCompareceu(linhaAgenda.IdAgenda, linhaAgenda.FlagCandidatoCompareceu))"
+                                                        />                                                
+                                            }
+                                        </td>
                                         <td>@linhaAgenda.HoraAgenda</td>
                                         <td>@linhaAgenda.NomeCandidato</td>
                                         <td>@linhaAgenda.Telefone</td>
-                                        <td>@if(linhaAgenda.StatusExPsicoSigla == "APTO")
-                                                {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
-                                            else @if(linhaAgenda.StatusExPsicoSigla == "INAPTO")
-                                                {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
+                                        <td>@if(linhaAgenda.StatusExPsicoSigla == "REALIZADO")
+                                                {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Reallizado</span>}
+                                            else @if(linhaAgenda.StatusExPsicoSigla == "RETESTE")
+                                                {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Reteste</span>}
                                             else @if(linhaAgenda.StatusExPsicoSigla == "AREALIZAR")
                                                 {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
-                                            else @if(linhaAgenda.StatusExPsicoSigla == "CANC")
+                                            else @if(linhaAgenda.StatusExPsicoSigla == "CANCELADO")
                                                 {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
                                             else @if(linhaAgenda.StatusExPsicoSigla == "REAGENDADO")
                                                 {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
@@ -159,10 +184,13 @@
     public DateTime dataSelecionada;
     public string? trcolor;
     private string? dataAgendaSessionStorage;
+    public string? traceMessage ="##Início##";
+    public bool flagDesabilitaEdicao = false;
+    public bool flagMostraTrace = false;
+    public string? httpDiretorioBase = "https://localhost:7037/";
 
     [CascadingParameter]
-    private Task
-    <AuthenticationState> _authState { get; set; }
+    private Task <AuthenticationState> _authState { get; set; }
     private AuthenticationState authState;
 
     //instancia uma lista da classe "DataAgendas" no objeto "listDtAgendas"
@@ -173,6 +201,34 @@
 
     //instancia um array da classe Agenda no objeto listAgendas - não usado
     public SiginUser.Models.Agenda[]? listAgendas { get; set; } 
+
+    //instancia a classe Dominio como objeto flagMostraTrace
+    public SiginUser.Models.Dominio[]? cfgMostraTrace { get; set; }
+
+    //instancia um objeto para alterar a flagCandidadtoCompareceu
+    public SiginUser.Models.Updates.UpdateFlagCompareceu? objFlagCampareceu { get; set; }
+
+    /// ---------------------------------------------------------
+    /// <summary>
+    /// carrega o listbox com as datas das agendas
+    /// </summary>
+    /// <returns></returns>
+    /// ---------------------------------------------------------
+    /// 
+    protected override async Task OnInitializedAsync()
+    {
+        traceMessage = traceMessage + " | " + "Entrando OnInitializedAsync";
+
+        //estado de autenticação do usuário
+        authState = await _authState;
+        if (authState.User.Identity.IsAuthenticated == false)
+        {
+            navigate.NavigateTo("/Identity/Account/Login");
+        }
+
+        traceMessage = traceMessage + " | " + "Saindo";
+    }
+
 
 
     /// ---------------------------------------------------------------
@@ -188,14 +244,27 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            traceMessage = traceMessage + " | " + $"Entrando OnAfterRenderAsync com firstRender = {firstRender}";
+
             //recupera data do session storage
             dataAgendaSessionStorage = await js.InvokeAsync<string>("GetFromSessionStorage", "dataSelecionadaToList");
             if (dataAgendaSessionStorage == null) dataAgendaSessionStorage = "";
 
-            await VerificaAgendaParaHoje();
+            traceMessage = traceMessage + " | " + $"dataAgendaSessionStorage = {dataAgendaSessionStorage}";
+
+            //ler a flagMostraTrace
+            if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+            cfgMostraTrace = await http.GetFromJsonAsync<SiginUser.Models.Dominio[]>("api/dominio/GetDominiosByCampo/cfgMostraTrace");
+            flagMostraTrace = Convert.ToBoolean(cfgMostraTrace[0].Sigla);
+
+            //carrega as datas das agendas
+            await GetDatasAgendas();
+            VerificaAgendaParaHoje();
             await GetResumoAgendasByCpfData(CpfProfisional, dataSelecionada.ToString("yyyy-MM-dd"), dataSelecionada.ToString("yyyy-MM-dd"));
 
-            // avisa ao sistema para renderizar a tela
+            traceMessage = traceMessage + " | " + "Saindo";
+
+            //avisa ao sistema para renderizar a tela
             StateHasChanged();
         }
     }
@@ -210,28 +279,12 @@
     /// 
     private async Task SaveSessionData() 
     {
+        traceMessage = traceMessage + " | Entrando SaveSessionData";
+
         var tempdata = dataSelecionada.ToString("yyyy-MM-dd");
         await js.InvokeVoidAsync("SaveToSessionStorage","dataSelecionadaToList", tempdata);
-    }
 
-
-    /// ---------------------------------------------------------
-    /// <summary>
-    /// carrega o listbox com as datas das agendas
-    /// </summary>
-    /// <returns></returns>
-    /// ---------------------------------------------------------
-    /// 
-    protected override async Task OnInitializedAsync()
-    {
-        //estado de autenticação do usuário
-        authState = await _authState;
-        if (authState.User.Identity.IsAuthenticated == false)
-        {
-            await js.InvokeVoidAsync("NavegarPara", "/Identity/Account/Login");
-        }
-        //carrega as datas das agendas
-        await GetDatasAgendas();
+        traceMessage = traceMessage + " | Saindo";
     }
 
 
@@ -245,9 +298,13 @@
     /// 
     async Task GetDatasAgendas()
     {
+        traceMessage = traceMessage + " | " + "Entrando GetDatasAgendas";
+
         //ler do banco e carrega o objeto "listDtAgendas"
         if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
         listDtAgendas = await http.GetFromJsonAsync<DataAgendas[]>($"api/servicos/GetDataAgendasByCpf/{CpfProfisional}");  
+
+        traceMessage = traceMessage + " | " + "Saindo";
     }
 
 
@@ -257,8 +314,10 @@
     /// </summary>
     ///--------------------------------------------------------
     ///
-    async Task VerificaAgendaParaHoje()
+    void VerificaAgendaParaHoje()
     {
+        traceMessage = traceMessage + " | " + "Entrando VerificaAgendaParaHoje";
+
         if (dataAgendaSessionStorage != null && dataAgendaSessionStorage != "")
         {
             flagExibirMensagem = false;
@@ -284,6 +343,9 @@
                 }
             }            
         }
+
+        traceMessage = traceMessage + " | " + "Saindo";
+
     }
 
 
@@ -314,15 +376,19 @@
     ///
     async Task GetResumoAgendasByCpfData(string cpfProfissional, string dtAgendaDe, string dtAgendaAte)
     {
+        traceMessage = traceMessage + " | " + "Entrando GetResumoAgendasByCpfData";
+
         //ler do banco e carrega o array de resumo de agendas
         if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
         listResumoAgendas = await http.GetFromJsonAsync<ResumoAgendas[]>($"api/servicos/GetResumoAgendasByCpfData/{cpfProfissional}/{dtAgendaDe}/{dtAgendaAte}");  
+
+        traceMessage = traceMessage + " | " + "Saindo";
     }
 
 
     ///--------------------------------------------------------
     /// <summary>
-    /// Carrega agendas da data selecionada
+    /// Pesquisa agenda pela data selecionada
     /// </summary>
     /// <param name="cpfProfissional"></param>
     /// <param name="dtAgendaDe"></param>
@@ -332,9 +398,13 @@
     ///
     async Task GetAgendasByCpfData(string cpfProfissional, string dtAgendaDe, string dtAgendaAte)
     {
+        traceMessage = traceMessage + " | " + "Entrando GetAgendasByCpfData";
+
         //ler do banco e carrega o array de agendas
         if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
         listAgendas = await http.GetFromJsonAsync<SiginUser.Models.Agenda[]>($"api/agenda/GetAgendasByCpfData/{cpfProfissional}/{dtAgendaDe}/{dtAgendaAte}");  
+
+        traceMessage = traceMessage + " | " + "Saindo";
     }
 
 
@@ -350,19 +420,53 @@
     }
 
 
+    /// -------------------------------------------------
     /// <summary>
     /// Editar linha da agenda
     /// </summary>
     /// <param name="agendaId"></param>
     /// <returns></returns>
+    /// ------------------------------------------------
+    ///
     private async Task EditarLinha(int agendaId)
     {
-        flagSairDaEdicao = true;
-        await SaveSessionData();
-        await js.InvokeVoidAsync("SaveToSessionStorage","rotaretorno","/");
-        await js.InvokeVoidAsync("NavegarPara", $"agenda/editar/{agendaId}");
+        if (flagDesabilitaEdicao)
+        {
+            flagDesabilitaEdicao = false;
+        }
+        else
+        {
+            flagSairDaEdicao = true;
+            await SaveSessionData();
+            await js.InvokeVoidAsync("SaveToSessionStorage", "rotaretorno", "/");
+            navigate.NavigateTo($"agenda/editar/{agendaId}");
+        }
     }
 
+    /// ---------------------------------------------
+    /// <summary>
+    /// Marca ou desmarca se o candidato compareceu
+    /// </summary>
+    /// <param name="agendaId"></param>
+    /// <param name="flagComprareceu"></param>
+    /// <returns></returns>
+    /// ---------------------------------------------
+    /// 
+    private async Task MarcarCompareceu(int agendaId, bool flagComprareceu)
+    {
+        UpdateFlagCompareceu oFlg = new UpdateFlagCompareceu();
+        flagDesabilitaEdicao = true;
+        flagComprareceu = !flagComprareceu;
+
+        oFlg.IdAgenda = agendaId;
+        oFlg.FlagCandidatoComprareceu = flagComprareceu;
+
+        //atualiza a flag na agenda
+        if (http.BaseAddress == null) { http.BaseAddress = new Uri("https://localhost:7037/"); }
+        await http.PutAsJsonAsync($"api/servicos/UpdateFlagCompareceuById/{agendaId}",oFlg);
+    }
+
+    
     private async void MudarLinha(int incremento)
     {
         await js.InvokeVoidAsync("alert", "recebido parametro " + incremento.ToString());

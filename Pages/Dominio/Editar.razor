@@ -2,7 +2,7 @@
 @using SiginUser.Models
 @using SiginUser.Pages.Dominio
 @inject HttpClient  http
-@inject NavigationManager navigation
+@inject NavigationManager navigate
 @inject IJSRuntime js
 
 @if(dominioId == 0)
@@ -21,28 +21,28 @@ else
     <DataAnnotationsValidator />
     
     <div class="form-group">
-        <label form="campo">Campo</label>
+        <label style="color:slateblue">Campo</label>
         <div>
             <InputText @bind-Value="@dominio.Campo" class="form-control" />
             <ValidationMessage For="@(()=>dominio.Campo)" />
         </div>
     </div>
     <div class="form-group">
-        <label form="sigla">Sigla</label>
+        <label style="color:slateblue">Sigla</label>
         <div>
             <InputText @bind-Value="@dominio.Sigla" class="form-control" />
             <ValidationMessage For="@(()=>dominio.Sigla)" />
         </div>
     </div>
         <div class="form-group">
-        <label form="descricao">Descricao</label>
+        <label style="color:slateblue">Descricao</label>
         <div>
             <InputText @bind-Value="@dominio.Descricao" class="form-control" />
             <ValidationMessage For="@(()=>dominio.Descricao)" />
         </div>
     </div>
         <div class="form-group">
-        <label form="sequencia">Sequência</label>
+        <label style="color:slateblue">Sequência</label>
         <div>
             <InputNumber @bind-Value="@dominio.Sequencia" class="form-control" />
             <ValidationMessage For="@(()=>dominio.Sequencia)" />
@@ -62,6 +62,11 @@ else
     //instância a classe Dominio no objeto dominio
     Dominio dominio = new Dominio();    
 
+
+    /// <summary>
+    /// Recebe os parâmetros e ler o registro a editar
+    /// </summary>
+    /// <returns></returns>
     protected async override Task OnParametersSetAsync()
     {
         //ler os dados do domínio a ser editado
@@ -73,6 +78,11 @@ else
         }
     }
 
+
+    /// <summary>
+    /// Sala o resultado da edição  (alteração ou inclusão)
+    /// </summary>
+    /// <returns></returns>
     async Task SalvarEdicaoDominio()
     {
         if (dominioId == 0)
@@ -87,9 +97,14 @@ else
         }
 
         //navega de volta para a página index do dominio
-        await js.InvokeVoidAsync("NavegarPara", "dominio");       
+        navigate.NavigateTo("dominio");       
     }
 
+
+    /// <summary>
+    /// Exclui o dominio solicitado
+    /// </summary>
+    /// <returns></returns>
     async Task ExcluirDominio()
     {
         //exclui dominio informado
@@ -99,6 +114,6 @@ else
             await http.DeleteAsync($"api/dominio/DeleteDominioById/{dominioId}");
         }
 
-        await js.InvokeVoidAsync("NavegarPara", "dominio");
+        navigate.NavigateTo("dominio");
     }
 }

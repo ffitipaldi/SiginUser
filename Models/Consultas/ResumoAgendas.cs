@@ -7,5 +7,6 @@
         public string? NomeCandidato { get; set; }
         public string? Telefone { get; set; }
         public string? StatusExPsicoSigla { get; set; }
+        public bool FlagCandidatoCompareceu { get; set; }
     }
 }

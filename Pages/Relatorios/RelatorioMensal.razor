@@ -46,7 +46,7 @@
             {
                 <div class="row">
 
-                    <!-- Detalhe dos agendamentos - tabela a esquerda -->
+                    <!-- Detalhe dos agendamentos  -->
                     <div class="col-sm">
                         <table class="table table-hover">
                             <thead>
@@ -64,10 +64,10 @@
                                 @foreach (var linAgenda in listResumoAgendas)
                                 {
                                     <!--determina a cor da linha de acordo com o status-->
-                                    @if(linAgenda.StatusExPsicoSigla == "APTO") trcolor = "forestgreen"; 
-                                    else @if(linAgenda.StatusExPsicoSigla == "INAPTO") trcolor = "cadetblue"; 
+                                    @if(linAgenda.StatusExPsicoSigla == "REALIZADO") trcolor = "forestgreen"; 
+                                    else @if(linAgenda.StatusExPsicoSigla == "RETESTE") trcolor = "cadetblue"; 
                                     else @if(linAgenda.StatusExPsicoSigla == "AREALIZAR") trcolor = "black"; 
-                                    else @if(linAgenda.StatusExPsicoSigla == "CANC") trcolor = "red"; 
+                                    else @if(linAgenda.StatusExPsicoSigla == "CANCELADO") trcolor = "red"; 
                                     else @if(linAgenda.StatusExPsicoSigla == "REAGENDADO") trcolor = "blue";   
                                 
                                     <!--desenha a tabela de linhas da agenda-->
@@ -78,13 +78,13 @@
                                         <td>@linAgenda.NomeCandidato</td>
                                         <td>@linAgenda.Telefone</td>
                                         <td>@linAgenda.TipoProcesso</td>
-                                        <td>@if(linAgenda.StatusExPsicoSigla == "APTO")
-                                                {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Apto</span>}
-                                            else @if(linAgenda.StatusExPsicoSigla == "INAPTO")
-                                                {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Inapto</span>}
+                                        <td>@if(linAgenda.StatusExPsicoSigla == "REALIZADO")
+                                                {<span class="oi oi-thumb-up me-2" aria-hidden="true"> Realizado</span>}
+                                            else @if(linAgenda.StatusExPsicoSigla == "RETESTE")
+                                                {<span class="oi oi-thumb-down me-2" aria-hidden="true"> Reteste</span>}
                                             else @if(linAgenda.StatusExPsicoSigla == "AREALIZAR")
                                                 {<span class="oi oi-target me-2" aria-hidden="true"> A realizar </span>}
-                                            else @if(linAgenda.StatusExPsicoSigla == "CANC")
+                                            else @if(linAgenda.StatusExPsicoSigla == "CANCELADO")
                                                 {<span class="oi oi-circle-x me-2" aria-hidden="true"> Cancelado</span>}                                        
                                             else @if(linAgenda.StatusExPsicoSigla == "REAGENDADO")
                                                 {<span class="oi oi-loop-circular me-2" aria-hidden="true"> Reagendado</span>}   
@@ -177,22 +177,28 @@
         numSequencia = 1;
         if (changeEventArgs.Value.ToString() != "")
         {
+            //recupera a data clicada
             dataSelecionada = Convert.ToDateTime(changeEventArgs.Value.ToString());
+
+            //guarda a data na sessão
+            var tempdata = dataSelecionada.ToString("yyyy-MM-dd");
+            await js.InvokeVoidAsync("SaveToSessionStorage","dataSelecionadaToList", tempdata);
+
+            //pega as agendas da data selecionada
             await GetResumoAgendasMesByCpfData(CpfProfisional, changeEventArgs.Value.ToString());
         }
     }
 
 
-    ///--------------------------------------------------------
+    /// -----------------------------------------------
     /// <summary>
     /// Carrega lista de resumos de agendas
     /// </summary>
     /// <param name="cpfProfissional"></param>
-    /// <param name="dtAgendaDe"></param>
-    /// <param name="dtAgendaAte"></param>
+    /// <param name="dtAgendaMes"></param>
     /// <returns></returns>
-    ///--------------------------------------------------------
-    ///
+    /// -----------------------------------------------
+    /// 
     async Task GetResumoAgendasMesByCpfData(string cpfProfissional, string dtAgendaMes)
     {
         //ler do banco e carrega o array de resumo de agendas
@@ -200,11 +206,19 @@
         listResumoAgendas = await http.GetFromJsonAsync<ResumoAgendasMes[]>($"api/servicos/GetResumoAgendasMesByCpfData/{cpfProfissional}/{dtAgendaMes}");  
     }
 
+    /// ----------------------------------------------
+    /// <summary>
+    /// Editar a linha da agenda clicada
+    /// </summary>
+    /// <param name="agendaId"></param>
+    /// <returns></returns>
+    /// -----------------------------------------------
+    /// 
     private async Task EditarLinha(int agendaId)
     {
         flagSairDaEdicao = true;
         await js.InvokeVoidAsync("SaveToSessionStorage","rotaretorno","/relmensal");
-        await js.InvokeVoidAsync("NavegarPara", $"agenda/editar/{agendaId}");
+        navigate.NavigateTo($"agenda/editar/{agendaId}");
     }
 
     /// ---------------------------------------------------------------

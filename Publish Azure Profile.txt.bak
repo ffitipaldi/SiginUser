@@ -1,0 +1,122 @@
+<publishData>
+	<publishProfile 
+			profileName="SigInUser - Web Deploy" 
+			publishMethod="MSDeploy" 
+			publishUrl="siginuser.scm.azurewebsites.net:443" 
+			msdeploySite="SigInUser" 
+			userName="$SigInUser" 
+			userPWD="8d4hYhp5pfgEjc6r7hbZZk0lWbiqbesoKj3SBJZHmKDQo2Nsu1bdATysSjGc" 
+			destinationAppUrl="http://siginuser.azurewebsites.net" 
+			
+			SQLServerDBConnectionString="Data Source=tcp:siginuserdbdbserver.database.windows.net,1433;Initial Catalog=SiginUserDB;
+			User Id=ffitipaldi@siginuserdbdbserver;
+			Password=Fiti@123" 
+			mySQLDBConnectionString="" 
+			
+			hostingProviderForumLink="" 
+			controlPanelLink="http://windows.azure.com" 
+			webSystem="WebSites" 
+			targetDatabaseEngineType="sqlazuredatabase" 
+			targetServerVersion="Version100"
+		>
+			
+		<databases>
+			<add 
+				name="DefaultConnection" 
+				connectionString="Data Source=tcp:siginuserdbdbserver.database.windows.net,1433;
+				Initial Catalog=SiginUserDB;
+				User Id=ffitipaldi@siginuserdbdbserver;
+				Password=Fiti@123" 
+				providerName="System.Data.SqlClient" 
+				type="Sql" 
+				targetDatabaseEngineType="sqlazuredatabase" 
+				targetServerVersion="Version100" 
+			/>
+			<add 
+				name="SigInUserDB" 
+				connectionString="" 
+				providerName="System.Data.SqlClient" 
+				type="Sql" 
+			/>
+		</databases>
+		
+		</publishProfile>
+			<publishProfile 
+				profileName="SigInUser - FTP" 
+				publishMethod="FTP" 
+				publishUrl="ftp://waws-prod-cq1-023.ftp.azurewebsites.windows.net/site/wwwroot" 
+				ftpPassiveMode="True" 
+				userName="SigInUser\$SigInUser" 
+				userPWD="8d4hYhp5pfgEjc6r7hbZZk0lWbiqbesoKj3SBJZHmKDQo2Nsu1bdATysSjGc" 
+				destinationAppUrl="http://siginuser.azurewebsites.net" 
+				SQLServerDBConnectionString="Data Source=tcp:siginuserdbdbserver.database.windows.net,1433;
+				Initial Catalog=SiginUserDB;
+				User Id=ffitipaldi@siginuserdbdbserver;
+				Password=Fiti@123" 
+				mySQLDBConnectionString="" 
+				hostingProviderForumLink="" 
+				controlPanelLink="http://windows.azure.com" 
+				webSystem="WebSites" 
+				targetDatabaseEngineType="sqlazuredatabase" 
+				targetServerVersion="Version100"
+			>
+			<databases>
+				<add 
+					name="DefaultConnection" 
+					connectionString="Data Source=tcp:siginuserdbdbserver.database.windows.net,1433;
+					Initial Catalog=SiginUserDB;
+					User Id=ffitipaldi@siginuserdbdbserver;
+					Password=Fiti@123" 
+					providerName="System.Data.SqlClient" 
+					type="Sql" 
+					targetDatabaseEngineType="sqlazuredatabase" 
+					targetServerVersion="Version100" 
+				/>
+				<add 
+					name="SigInUserDB" 
+					connectionString="" 
+					providerName="System.Data.SqlClient" 
+					type="Sql" 
+				/>
+			</databases>
+		</publishProfile>
+		
+		<publishProfile 
+			profileName="SigInUser - Zip Deploy" 
+			publishMethod="ZipDeploy" 
+			publishUrl="siginuser.scm.azurewebsites.net:443" 
+			userName="$SigInUser" 
+			userPWD="8d4hYhp5pfgEjc6r7hbZZk0lWbiqbesoKj3SBJZHmKDQo2Nsu1bdATysSjGc" 
+			destinationAppUrl="http://siginuser.azurewebsites.net" 
+			SQLServerDBConnectionString="Data Source=tcp:siginuserdbdbserver.database.windows.net,1433;
+			Initial Catalog=SiginUserDB;
+			User Id=ffitipaldi@siginuserdbdbserver;
+			Password=Fiti@123" 
+			mySQLDBConnectionString="" 
+			hostingProviderForumLink="" 
+			controlPanelLink="http://windows.azure.com" 
+			webSystem="WebSites" 
+			targetDatabaseEngineType="sqlazuredatabase" 
+			targetServerVersion="Version100"
+		>
+		<databases>
+			<add 
+				name="DefaultConnection" 
+				connectionString="Data Source=tcp:siginuserdbdbserver.database.windows.net,1433;
+				Initial Catalog=SiginUserDB;
+				User Id=ffitipaldi@siginuserdbdbserver;
+				Password=Fiti@123" 
+				providerName="System.Data.SqlClient" 
+				type="Sql" 
+				targetDatabaseEngineType="sqlazuredatabase" 
+				targetServerVersion="Version100" 
+			/>
+			<add 
+				name="SigInUserDB" 
+				connectionString="" 
+				providerName="System.Data.SqlClient" 
+				type="Sql" 
+			/>
+		</databases>
+	</publishProfile>
+</publishData>

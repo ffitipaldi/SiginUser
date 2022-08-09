@@ -8,12 +8,20 @@ using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//var azureConnectionString = "Data Source=tcp:siginuserdbdbserver.database.windows.net,1433; Initial Catalog = SiginUserDB; User Id = ffitipaldi@siginuserdbdbserver; Password = Fiti@123";
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(azureConnectionString));
+
 var sqlConnectionConfiguration = new SqlConnectionConfiguration(
                builder.Configuration.GetConnectionString("SqlDbContext"));
+
+//var sqlConnectionConfiguration = new SqlConnectionConfiguration(azureConnectionString);
+
 builder.Services.AddSingleton(sqlConnectionConfiguration);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();

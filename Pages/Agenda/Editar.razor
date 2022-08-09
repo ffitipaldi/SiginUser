@@ -50,14 +50,32 @@ else
 
         <div class="row">
             <div class="col form-group">
-                <label form="DataAgenda" style="color:gray">Data da Agenda</label>
-                <div>
-                    <InputDate @bind-Value="@agenda.DataAgenda" class="form-control" />
-                    <ValidationMessage For="@(()=>agenda.DataAgenda)" />
+                <div class="row">
+                    <div class="col-4 form-group">
+                        <label form="Compareceu" style="color:slateblue">Compareceu</label>
+                        <div>
+                            <div class="row">
+                                <div class="col-2 form-group"></div>
+                                <div class="col-10 form-group">
+                                    <InputCheckbox  @bind-Value=@agenda.FlagCandidatoCompareceu class="form-check-input" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-8 form-group">
+                        <label form="DataAgenda" style="color:slateblue">Data da Agenda</label>
+                        <div>
+                            <InputDate @bind-Value="@agenda.DataAgenda" class="form-control" />
+                            <ValidationMessage For="@(()=>agenda.DataAgenda)" />
+                        </div>
+                    </div>
+
                 </div>
             </div>
+
             <div class="col form-group">
-                <label style="color:gray">Hora da Agenda</label>
+                <label style="color:slateblue">Hora da Agenda</label>
                 <div>
                     <InputText @bind-Value="@agenda.HoraAgenda" class="form-control" />
                     <ValidationMessage For="@(()=>agenda.HoraAgenda)" />
@@ -66,14 +84,14 @@ else
         </div>
         <div class="row">
             <div class="form-group col-md-6">
-                <label style="color:gray">Nome do Candidato</label>
+                <label style="color:slateblue">Nome do Candidato</label>
                 <div>
                     <InputText @bind-Value="@agenda.NomeCandidato" class="form-control text-uppercase" />
                     <ValidationMessage For="@(()=>agenda.NomeCandidato)" />
                 </div>
             </div>
             <div class="form-group col-md-6">
-                <label style="color:gray">E-mail</label>
+                <label style="color:slateblue">E-mail</label>
                 <div>
                     <InputText @bind-Value="@agenda.EmailCandidato" class="form-control" />
                     <ValidationMessage For="@(()=>agenda.EmailCandidato)" />
@@ -82,14 +100,14 @@ else
         </div>
         <div class="row">
             <div class="form-group col">
-                <label style="color:gray">Telefone</label>
+                <label style="color:slateblue">Telefone</label>
                 <div>
                     <InputText @bind-Value="@agenda.Telefone" class="form-control" />
                     <ValidationMessage For="@(()=>agenda.Telefone)" />
                 </div>
             </div>
             <div class="form-group col">
-                <label style="color:gray">Cpf do Candidato</label>
+                <label style="color:slateblue">Cpf do Candidato</label>
                 <div>
                     <InputText @bind-Value="@agenda.CpfCandidato" class="form-control" />
                     <ValidationMessage For="@(()=>agenda.CpfCandidato)" />
@@ -98,7 +116,7 @@ else
         </div>
         <div class="row">
             <div class="col form-group">
-                <label style="color:gray">Procedimento</label>
+                <label style="color:slateblue">Procedimento</label>
                 <div>
                     <InputSelect @bind-Value="agenda.TipoProcesso" class="form-control-sm">
                         <option value="">Escolha uma opção</option>
@@ -111,7 +129,7 @@ else
                 </div>
             </div>
             <div class="col form-group">
-                <label style="color:gray">Categoria</label>
+                <label style="color:slateblue">Categoria</label>
                 <div>
                     <InputText @bind-Value="@agenda.Categoria" class="form-control" />
                     <ValidationMessage For="@(()=>agenda.Categoria)" />
@@ -120,7 +138,7 @@ else
         </div>
         <div class="row">
             <div class="form-group col">
-                <label style="color:gray">Status Exame</label>
+                <label style="color:slateblue">Status Exame</label>
                 <div>
                     <InputSelect @bind-Value="agenda.StatusExPsico" class="form-control-sm">
                         <option value="">Escola uma opção</option>
@@ -133,7 +151,7 @@ else
                 </div>
             </div>
             <div class="form-group col">
-                <label style="color:gray">Data Original Detran</label>
+                <label style="color:slateblue">Data Original Detran</label>
                 <div>
                     <InputDate @bind-Value="@agenda.DataAgendaDetran" class="form-control" readonly="readonly" />
                     <ValidationMessage For="@(()=>agenda.DataAgendaDetran)" />
@@ -141,7 +159,7 @@ else
             </div>
         </div>
         <div class="form-group">
-            <label style="color:gray">Observação</label>
+            <label style="color:slateblue">Observação</label>
             <div>
                 <InputText @bind-Value="@agenda.Observacao" class="form-control" />
                 <ValidationMessage For="@(()=>agenda.Observacao)" />
@@ -158,8 +176,7 @@ else
     [Parameter] public int agendaId { get; set; }               //parametro "agendaId"
     ImportAgendaTxt importagendatxt = new ImportAgendaTxt();    //campo string da linha importada
     private string[]? Campos;                                   //campos split da linha
-    private int i = 0;                                          //campo auxiliar
-    private string? rotaRetorno;                                        //campo salvo para retorno
+    private string? rotaRetorno;                                //campo salvo para retorno
 
     //flag utilizada para sair da edição ao se utilizar o NavigateTO
     private bool flagSairDaEdicao = false;
@@ -255,6 +272,17 @@ else
             }
         }
 
+        // se Status = "Reteste" coloca "Reteste" no Procedimento para não cobrar
+        if(agenda.StatusExPsico == "RETESTE")
+        {
+            //caso seja aprimeira vez de Reteste, atualiza data do Detran
+            if(agenda.TipoProcesso != "RETESTE")
+            {
+                agenda.DataAgendaDetran = agenda.DataAgenda;
+            }
+            agenda.TipoProcesso = "RETESTE";
+        }
+
         //retira pontuação no cpf
         agenda.CpfCandidato = agenda.CpfCandidato.Replace(".", "");
         agenda.CpfCandidato = agenda.CpfCandidato.Replace("-", "");
@@ -274,7 +302,7 @@ else
             agenda.DataAgenda = DateTime.Parse(agenda.DataAgenda.ToString("yyyy-MM-dd") + "T" + agenda.HoraAgenda + ":00");
 
             //verifia se houve Reagendamento
-            if((agenda.StatusExPsico != "APTO" && agenda.StatusExPsico != "INAPTO") && dataAgendaAntes != agenda.DataAgenda)
+            if((agenda.StatusExPsico != "REALIZADO" && agenda.StatusExPsico != "RETESTE") && dataAgendaAntes != agenda.DataAgenda)
             {
                 agenda.StatusExPsico = "REAGENDADO";
             }
@@ -321,7 +349,7 @@ else
         if (rotaRetorno != null)
         {
             await js.InvokeVoidAsync("DestroyFromSessionStorage","rotaretorno");
-            await js.InvokeVoidAsync("NavegarPara", rotaRetorno);    
+            navigate.NavigateTo(rotaRetorno, true);    
         }
     }
 

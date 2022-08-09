@@ -9,11 +9,11 @@ namespace SiginUser.Models
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(10, ErrorMessage = "Campo limitado a 10 caracteres no máximo.")]
-        public string TipoPerfil { get; set; }
+        public string? TipoPerfil { get; set; }
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(11, ErrorMessage = "Campo limitado a 11 caracteres no máximo.")]
-        public string CpfProfissional { get; set; }
+        public string? CpfProfissional { get; set; }
 
         public DateTime DataAgenda { get; set; }
 
@@ -30,7 +30,7 @@ namespace SiginUser.Models
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(50, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]
-        public string NomeCandidato { get; set; }
+        public string? NomeCandidato { get; set; }
 
         [MaxLength(40, ErrorMessage = "Campo limitado a 40 caracteres no máximo.")]
         public string? Telefone { get; set; }
@@ -49,9 +49,11 @@ namespace SiginUser.Models
 
         [Required(ErrorMessage = "Campo Obrigatório")]
         [MaxLength(10, ErrorMessage = "Campo limitado a 10 caracteres no máximo.")]
-        public string StatusExPsico { get; set; }
+        public string? StatusExPsico { get; set; }
 
         [MaxLength(50, ErrorMessage = "Campo limitado a 50 caracteres no máximo.")]
         public string? Observacao { get; set; }
+
+        public bool FlagCandidatoCompareceu { get; set; }
     }
 }

@@ -9,7 +9,7 @@
 <div>
     <!--Novo Dominio chama edição com Id=0 -->
     <a class="btn btn-info float-end" @onclick="@(()=> EditarLinha(0))">
-        Novo Domínio"  
+        Novo Domínio  
     </a>
 </div>
 
@@ -23,34 +23,38 @@ else if(dominios.Length == 0)
 }
 else
 {
-    //exibir os Domínios
-    <table class="table table-hover"  width="100%">
-        <thead>
-            <tr>
-                <th>Sequencia</th> 
-                <th>Campo</th>
-                <th>Sigla</th>                
-                <th>Descrição</th>                           
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var dominio in dominios)
-            {   
-                <tr @onclick="@(()=> EditarLinha(dominio.Id))"> 
-                    <td>@dominio.Sequencia</td>
-                    <td>@dominio.Campo</td>
-                    <td>@dominio.Sigla</td>
-                    <td>@dominio.Descricao</td>
+    @if (!flagSairLoop)
+    {
+        //exibir os Domínios
+        <table class="table table-hover"  width="100%">
+            <thead>
+                <tr>
+                    <th>Sequencia</th> 
+                    <th>Campo</th>
+                    <th>Sigla</th>                
+                    <th>Descrição</th>                           
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var dominio in dominios)
+                {
+                    <tr @onclick="@(()=> EditarLinha(dominio.Id))"> 
+                        <td>@dominio.Sequencia</td>
+                        <td>@dominio.Campo</td>
+                        <td>@dominio.Sigla</td>
+                        <td>@dominio.Descricao</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 }
 
 @code {
     //instancia um array da classe "Dominios" no objeto "dominios"
     Dominio[]? dominios { get; set; }
-    public int numRender = 0; 
+    public int numRender = 0;
+    public bool flagSairLoop = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,9 +68,9 @@ else
         dominios = await http.GetFromJsonAsync<Dominio[]>("api/dominio/GetDominios");
     }
 
-    public async Task EditarLinha(int dominioId)
+    public void EditarLinha(int dominioId)
     {
-        await js.InvokeVoidAsync("NavegarPara", $"dominio/editar/{dominioId}");
-        await js.InvokeVoidAsync("alert", "ERRO-Não navegou.");               
+        flagSairLoop = true;
+        navigate.NavigateTo($"dominio/editar/{dominioId}");
     }
 }
